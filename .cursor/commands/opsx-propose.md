@@ -16,6 +16,14 @@ When ready to implement, run /opsx:apply
 
 ---
 
+**Screaming Architecture (every feature)** — **AGENTS.md** is normative. For **each** proposed change:
+
+- **Frontend (`apps/web`)**: Vertical **feature** folders (e.g. `file-browser/`); optional subfolders (`ui/`, `hooks/`, `lib/`, `api/`) inside the feature when the slice grows — not anonymous app-wide `components/` / `hooks/` / `pages/`.
+- **Backend (`apps/api`, NestJS)**: Apply the **same** idea — structure by **capability/feature**, not by technical layer at the app root. New or extended API work belongs under a **named feature folder** (e.g. `path-file-listing/`, `file-browser/`) containing module, controller, service, DTOs for that capability. **Do not** plan work that lands in generic root-level `controllers/`, `services/`, or `modules/` folders that mix many features.
+- **`design.md`**: MUST include a **Code layout (target)** subsection that names the intended **feature folder(s)** for web and/or API (paths under `apps/web/src/app/…` and `apps/api/src/app/…` or the repo’s equivalent), aligned with Screaming Architecture on **both** sides when the change touches them.
+
+---
+
 **Input**: The argument after `/opsx:propose` is the change name (kebab-case), OR a description of what the user wants to build.
 
 **Steps**
@@ -90,6 +98,7 @@ After completing all artifacts, summarize:
 
 **Artifact Creation Guidelines**
 
+- **Before writing artifacts**, read **[AGENTS.md](../../AGENTS.md)** (Screaming Architecture for React **and** NestJS) so `proposal.md`, **`design.md`**, and `tasks.md` reflect feature-based layout on **backend and frontend** where applicable.
 - Follow the `instruction` field from `openspec instructions` for each artifact type
 - The schema defines what each artifact should contain - follow it
 - Read dependency artifacts for context before creating new ones
@@ -99,6 +108,7 @@ After completing all artifacts, summarize:
   - These guide what you write, but should never appear in the output
 
 **Guardrails**
+- **Screaming Architecture on the API** is not optional for feature work: every propose pass that includes backend scope must place NestJS code in a **feature-named** folder structure per **AGENTS.md**; reflect that in **`design.md` Code layout (target)** and in tasks.
 - Create ALL artifacts needed for implementation (as defined by schema's `apply.requires`)
 - Always read dependency artifacts before creating a new one
 - If context is critically unclear, ask the user - but prefer making reasonable decisions to keep momentum

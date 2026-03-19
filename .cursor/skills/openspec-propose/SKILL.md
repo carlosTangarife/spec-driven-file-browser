@@ -20,6 +20,10 @@ When ready to implement, run /opsx:apply
 
 ---
 
+**Screaming Architecture (every feature)** — Read **AGENTS.md** at the repo root. Apply it to **both** **frontend** (`apps/web`, vertical feature folders) **and** **backend** (`apps/api`, NestJS: one **capability folder** per feature — module, controller, service, DTOs — **not** generic root-level `controllers/` / `services/` / `modules/` mixing unrelated features). **`design.md` MUST** include **Code layout (target)** naming intended feature paths for web and/or API when those apps are in scope.
+
+---
+
 **Input**: The user's request should include a change name (kebab-case) OR a description of what they want to build.
 
 **Steps**
@@ -94,6 +98,7 @@ After completing all artifacts, summarize:
 
 **Artifact Creation Guidelines**
 
+- Read **AGENTS.md** before drafting artifacts so **proposal**, **design**, and **tasks** align with Screaming Architecture on **React and NestJS** for this feature.
 - Follow the `instruction` field from `openspec instructions` for each artifact type
 - The schema defines what each artifact should contain - follow it
 - Read dependency artifacts for context before creating new ones
@@ -103,6 +108,7 @@ After completing all artifacts, summarize:
   - These guide what you write, but should never appear in the output
 
 **Guardrails**
+- Backend scope must be reflected as **feature-based** NestJS layout in **design.md** (and tasks), per **AGENTS.md** — not layer-only organization at the API app root.
 - Create ALL artifacts needed for implementation (as defined by schema's `apply.requires`)
 - Always read dependency artifacts before creating a new one
 - If context is critically unclear, ask the user - but prefer making reasonable decisions to keep momentum
