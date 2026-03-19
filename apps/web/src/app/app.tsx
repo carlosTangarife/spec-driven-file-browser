@@ -1,12 +1,6 @@
-import { HelloFromApi } from './HelloFromApi';
+import { FileBrowserPage } from './file-browser/FileBrowserPage';
 
-export function App() {
-  return (
-    <div>
-      <h1>Connection test</h1>
-      <HelloFromApi />
-    </div>
-  );
-}
-
-export default App;
+/**
+ * Root app shell: file browser listing UI backed by `/api/listing`.
+ */
+export const App = () => <FileBrowserPage />;

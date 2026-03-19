@@ -41,7 +41,7 @@ describe('fetchFileListing', () => {
     expect(result).toEqual([{ name: 'a', type: 'file' }]);
   });
 
-  it('throws when response is not ok', async () => {
+  it('throws ListingRequestError with HTTP status when response is not ok', async () => {
     // Arrange
     vi.mocked(fetch).mockResolvedValue({
       ok: false,
@@ -49,6 +49,8 @@ describe('fetchFileListing', () => {
     } as Response);
 
     // Act + Assert
-    await expect(fetchFileListing('missing')).rejects.toThrow('Listing error: 404');
+    await expect(fetchFileListing('missing')).rejects.toMatchObject({
+      status: 404,
+    });
   });
 });

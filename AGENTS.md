@@ -17,6 +17,7 @@ This document is the **single source of truth** for business context, **workflow
      - Title: `feat(api): implement path-file-listing (cross-platform-path-file-listing)`
      - Body: Short summary of what was implemented; list main areas (e.g. path resolution, Nest module, DTOs). Optionally include a one-line “Context: archived OpenSpec change …”.
    - This commit captures the full context of the change for future readers and for Cursor (good diff = good context).
+   - **Automation (Cursor)**: Run **`/feat-merge-main`** to **auto-generate** that commit message from **`git diff` vs `main`/`master`** and, when present, the **latest folder** under `openspec/changes/archive/` (read `proposal.md`, change name), then **merge the feature branch into trunk** locally. No interactive prompt unless the diff is ambiguous.
 
 ## Business objective
 

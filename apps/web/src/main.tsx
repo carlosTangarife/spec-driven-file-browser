@@ -2,7 +2,8 @@ import { StrictMode } from 'react';
 import * as ReactDOM from 'react-dom/client';
 import { ChakraProvider, defaultSystem } from '@chakra-ui/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import App from './app/app';
+import { App } from './app/app';
+import { ListingToaster } from './app/file-browser/listing-toaster';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -21,6 +22,7 @@ root.render(
   <StrictMode>
     <ChakraProvider value={defaultSystem}>
       <QueryClientProvider client={queryClient}>
+        <ListingToaster />
         <App />
       </QueryClientProvider>
     </ChakraProvider>
