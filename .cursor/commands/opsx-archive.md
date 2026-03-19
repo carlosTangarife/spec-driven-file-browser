@@ -2,12 +2,16 @@
 name: /opsx-archive
 id: opsx-archive
 category: Workflow
-description: Archive a completed change in the experimental workflow
+description: Archive OpenSpec change after api+web unit tests pass; then Git close-out (commit, merge to trunk)
 ---
 
-Archive a completed change in the experimental workflow.
+Archive a completed change and **finish Git in the same session** (conventional commit on the feature branch, merge into the integration branch, checkout that branch). **This command MUST NOT complete** (no OpenSpec move, no Git close-out) until **unit tests for `api` and `web` have been executed and pass** (see step **5**). Optional opt-out: OpenSpec archive only without Git if the user says so explicitly.
 
 **Input**: Optionally specify a change name after `/opsx:archive` (e.g., `/opsx:archive add-auth`). If omitted, check if it can be inferred from conversation context. If vague or ambiguous you MUST prompt for available changes.
+
+Normative workflow context: **AGENTS.md** § Workflow.
+
+---
 
 **Steps**
 
@@ -61,7 +65,18 @@ Archive a completed change in the experimental workflow.
 
    If user chooses sync, use Task tool (subagent_type: "general-purpose", prompt: "Use Skill tool to invoke openspec-sync-specs for change '<name>'. Delta spec analysis: <include the analyzed delta spec summary>"). Proceed to archive regardless of choice.
 
-5. **Perform the archive**
+5. **Run unit tests — `api` and `web` (mandatory — blocks archive if red)**
+
+   From the **repository root**, run **both** apps’ unit tests and require **green** before any OpenSpec move or Git close-out:
+
+   - **Preferred:** **`npm test`** — runs **`nx run-many -t test --projects=api,web`** (Vitest for **api** and **web**).
+   - **Equivalent:** **`npx nx test api`** and **`npx nx test web`** — **both** must exit **0**.
+
+   **If either fails:** **STOP** immediately. Do **not** run step **6** (Perform the archive) or step **8** (Git close-out). Report failing output; the user fixes tests and re-runs **`/opsx:archive`**.
+
+   Do not skip tests, ignore failures, or use workarounds (e.g. `passWithNoTests` where tests are required) to fake success. Aligns with **AGENTS.md** (Vitest, AAA).
+
+6. **Perform the archive**
 
    Create the archive directory if it doesn't exist:
    ```bash
@@ -78,7 +93,7 @@ Archive a completed change in the experimental workflow.
    mv openspec/changes/<name> openspec/changes/archive/YYYY-MM-DD-<name>
    ```
 
-6. **Display summary**
+7. **Display summary (OpenSpec only)**
 
    Show archive completion summary including:
    - Change name
@@ -86,6 +101,61 @@ Archive a completed change in the experimental workflow.
    - Archive location
    - Spec sync status (synced / sync skipped / no delta specs)
    - Note about any warnings (incomplete artifacts/tasks)
+
+8. **Git close-out (mandatory — same session)** unless the user **explicitly** opts out of Git (OpenSpec-only archive).
+
+   **8.1 — Preconditions**
+
+   - `git rev-parse --is-inside-work-tree`
+   - **Resolve integration branch** `<integration>`: **`trunk`** → **`main`** → **`master`** (first that exists locally — same order as **`scripts/git-feature-from-trunk.mjs`**).
+   - Current branch must be **`feature/<change-name>`** for this archived change. If current branch equals `<integration>` → **stop** (checkout the feature branch first). If not on the correct feature branch → **stop** and instruct.
+
+   **8.2 — Context and diff (for auto commit message)**
+
+   - `git branch --show-current` → `FEATURE_BRANCH`
+   - `git status -sb`
+   - Optional: `git fetch origin <integration>:<integration>` if safe; if no network, use local only.
+   - Always run:
+     - `git diff <integration>...HEAD --stat`
+     - `git diff <integration>...HEAD --name-only` (group by `apps/web`, `apps/api`, `openspec/`, other)
+
+   **8.3 — OpenSpec context for the commit body (when present)**
+
+   If `openspec/changes/archive/` exists:
+
+   1. Prefer the **most recently modified** folder under `openspec/changes/archive/*/` (mtime or sort `YYYY-MM-DD-*` descending).
+   2. Read **`proposal.md`**: use **## What Changes** (2–4 bullets) or **## Why** (one line) for the body.
+   3. Change name from folder: `archive/YYYY-MM-DD-<change-name>/`.
+   4. If `openspec/specs/` updated matching capability, mention in body.
+   5. Include when matched: `Context: archived OpenSpec change <change-name> (archive/YYYY-MM-DD-<change-name>/)`
+
+   If no archive readable: use **diff + branch name** only.
+
+   **8.4 — Conventional commit (no editor)**
+
+   - **Title:** `<type>(<scope>): <imperative summary>` — **type**: `feat` / `fix` / `chore` / `docs` by change kind.
+   - **scope** (first match from diff): only `apps/web` → `web`; only `apps/api` → `api`; both → `web-api`; only openspec → `openspec`; else strongest from `--stat`.
+   - **summary:** 50–72 chars, English, imperative; if branch is `feature/<kebab>`, humanize kebab for a short phrase.
+   - **Body:** 2–6 lines — OpenSpec lines if any, bullets from diff groups, final `Context:` line if archive matched.
+   - `git add -A`. If nothing to commit and clean → **stop** (“nothing to commit”).
+   - `git commit` with **title + body** (multiple `-m` or heredoc). **Do not open an editor.**
+   - Only ask the user if the diff mixes unrelated features (ambiguous).
+
+   **8.5 — Merge into integration branch**
+
+   - `git checkout <integration>`
+   - `git pull origin <integration>` if remote exists and safe
+   - `git merge FEATURE_BRANCH -m "Merge branch 'FEATURE_BRANCH' into <integration>"`
+   - On conflict: **stop**, list files.
+
+   **8.6 — After merge**
+
+   - Print current branch (`<integration>`). Working copy is on the integration branch; next work: **AGENTS.md** § Workflow step **6**.
+   - Remind: `git push origin <integration>` (and feature branch if used) — not automatic.
+
+   **Git close-out guardrails:** No `--no-verify` / `--force` unless the user asks. Commit messages in **English**. Prefer **one** commit on the feature branch before merge when using this flow.
+
+---
 
 **Output On Success**
 
@@ -96,8 +166,11 @@ Archive a completed change in the experimental workflow.
 **Schema:** <schema-name>
 **Archived to:** openspec/changes/archive/YYYY-MM-DD-<name>/
 **Specs:** ✓ Synced to main specs
+**Tests:** ✓ `api` + `web` (before archive)
 
 All artifacts complete. All tasks complete.
+
+Git: conventional commit + merge to integration branch + checkout completed.
 ```
 
 **Output On Success (No Delta Specs)**
@@ -109,8 +182,11 @@ All artifacts complete. All tasks complete.
 **Schema:** <schema-name>
 **Archived to:** openspec/changes/archive/YYYY-MM-DD-<name>/
 **Specs:** No delta specs
+**Tests:** ✓ `api` + `web` (before archive)
 
 All artifacts complete. All tasks complete.
+
+Git: conventional commit + merge to integration branch + checkout completed.
 ```
 
 **Output On Success With Warnings**
@@ -147,13 +223,13 @@ Target archive directory already exists.
 3. Wait until a different date to archive
 ```
 
-**After archive (Git)** — Archiving only moves OpenSpec files. To **commit**, **merge into trunk**, and **end on `main`/`master`** for the next spec, run **`/feat-merge-main`** on the feature branch (see **AGENTS.md**). The combined checklist is documented as **`/feat-spec-close`** (archive → merge).
-
 **Guardrails**
 - Always prompt for change selection if not provided
-- Use artifact graph (openspec status --json) for completion checking
-- Don't block archive on warnings - just inform and confirm
-- Preserve .openspec.yaml when moving to archive (it moves with the directory)
+- Use artifact graph (`openspec status --json`) for completion checking
+- **Step 5 (`api` + `web` unit tests) is mandatory** — if tests fail, **do not** archive or run Git close-out
+- Don't block archive on *other* warnings (incomplete artifacts/tasks with user confirm) — inform and confirm
+- Preserve `.openspec.yaml` when moving to archive (it moves with the directory)
 - Show clear summary of what happened
 - If sync is requested, use the Skill tool to invoke `openspec-sync-specs` (agent-driven)
 - If delta specs exist, always run the sync assessment and show the combined summary before prompting
+- After OpenSpec archive succeeds, run **step 8** unless the user opts out of Git; full workflow: **AGENTS.md** § Workflow

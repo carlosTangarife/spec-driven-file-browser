@@ -8,7 +8,7 @@ alwaysApply: true
 
 When implementing OpenSpec changes or writing React/NestJS code in this workspace, **read [AGENTS.md](../../AGENTS.md)** (workspace root). It is the single source of truth for:
 
-- **Workflow**: Proposal → **`/opsx:apply`** (auto-creates **`feature/<change-name>`** from OpenSpec change id, same as `proposal.md` folder) → Work → Archive → **`/feat-merge-main`**; on trunk, next spec can start with apply again (or **`/feat-start-change`** if not using apply).
+- **Workflow**: Proposal → **`/opsx:apply`** (creates **`feature/<change-name>`** — see command file) → Work → **`/opsx:archive`** (includes commit + merge to integration branch by default) → next change from integration branch per **AGENTS.md**.
 - **OpenSpec ↔ code**: Each change’s **design.md** should include **Code layout (target)**; **openspec/README.md** explains the link. Do not implement behavior outside specs; align folder/file choices with AGENTS.
 - **Screaming Architecture**: Top-level feature folders (`file-browser/`, `path-file-listing/`) — not app-wide `components/`, `hooks/`, `controllers/`. Inside a feature, optional subfolders (`ui/`, `hooks/`, `lib/`) are allowed when the slice grows.
 - **Clean Architecture (frontend slice)**: Map code to **domain/pure** → **application/hooks** → **infrastructure** (services, fetch, toaster) → **presentation** (dumb components). Page composes. See **React feature slice structure** in AGENTS.md.

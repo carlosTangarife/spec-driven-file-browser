@@ -78,6 +78,12 @@ Depending on what the user brings, you might:
 
 ---
 
+## Git / OpenSpec (when leaving explore for implementation)
+
+Do not implement here. Branch and close-out rules: **AGENTS.md** § Workflow.
+
+---
+
 ## OpenSpec Awareness
 
 You have full context of the OpenSpec system. Use it naturally, don't force it.

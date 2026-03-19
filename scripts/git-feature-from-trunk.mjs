@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Creates `feature/<kebab-name>` from trunk (`main` or `master`) and checks it out.
+ * Creates `feature/<kebab-name>` from the integration branch (prefer `trunk`, else `main`, else `master`) and checks it out.
  * Aligns with AGENTS.md: OpenSpec implementation happens on a feature branch, not on trunk.
  *
  * Usage:
@@ -30,9 +30,12 @@ function run(cmd, { allowFail = false, cwd } = {}) {
 }
 
 function resolveTrunk() {
+  if (run('git rev-parse --verify trunk', { allowFail: true })) return 'trunk';
   if (run('git rev-parse --verify main', { allowFail: true })) return 'main';
   if (run('git rev-parse --verify master', { allowFail: true })) return 'master';
-  console.error('[git-feature] Neither local branch "main" nor "master" exists.');
+  console.error(
+    '[git-feature] No integration branch found. Create local "trunk" (recommended), or "main", or "master".'
+  );
   process.exit(1);
 }
 

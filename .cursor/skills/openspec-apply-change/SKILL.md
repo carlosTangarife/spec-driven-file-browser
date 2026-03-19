@@ -33,10 +33,10 @@ Implement tasks from an OpenSpec change.
      ```bash
      npm run git:feature -- <name>
      ```
-     This creates or checks out `feature/<name>` from `main`/`master` per **AGENTS.md**.
-   - If the script is unavailable, replicate its behavior with git (checkout trunk, pull, `git checkout -b feature/<name>` or checkout existing).
-   - If the command fails (e.g. dirty working tree), **stop**, report the error, and wait — do not implement on `main`/`master`.
-   - Announce: **Branch ready: `feature/<name>`** (user should not need **`/feat-start-change`** when using apply).
+     This creates or checks out `feature/<name>` from the integration branch (**`trunk`**, else **`main`**, else **`master`**) per **AGENTS.md** and `scripts/git-feature-from-trunk.mjs`.
+   - If the script is unavailable, replicate its behavior with git (checkout integration branch, pull, `git checkout -b feature/<name>` or checkout existing).
+   - If the command fails (e.g. dirty working tree), **stop**, report the error, and wait — do not implement on the integration branch (`trunk` / `main` / `master`).
+   - Announce: **Branch ready: `feature/<name>`** (branch steps are part of **`/opsx:apply`** — see **`.cursor/commands/opsx-apply.md`**).
 
 3. **Check status to understand the schema**
    ```bash
@@ -139,7 +139,7 @@ Working on task 4/7: <task description>
 - [x] Task 2
 ...
 
-All tasks complete and unit tests passed (`npm test`). Ready to archive this change.
+All tasks complete and unit tests passed (`npm test`). Next: **`/opsx:archive`** — **AGENTS.md** § Workflow.
 ```
 
 **Output On Pause (Issue Encountered)**

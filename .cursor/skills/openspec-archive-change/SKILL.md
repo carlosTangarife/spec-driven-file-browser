@@ -50,11 +50,11 @@ Archive a completed change in the experimental workflow.
 
    **If no tasks file exists:** Proceed without task-related warning.
 
-3.5. **Run unit tests (mandatory — block archive if red)**
+3.5. **Run unit tests — `api` and `web` (mandatory — block archive if red)**
 
-   Run **`npm test`** (or `nx test api` and `nx test web` as appropriate for the change scope).
-   - If **any test fails**: **STOP**. Do **not** archive. Report failures and instruct the user to fix and re-run apply until green.
-   - Archive is only allowed when unit tests pass. Same rules as apply: Vitest, AAA, no skipped tests to fake success.
+   Same as **`.cursor/commands/opsx-archive.md`** step **5**: run **`npm test`** (both **api** and **web**) or **`nx test api`** and **`nx test web`** — **both** must pass.
+   - If **any test fails**: **STOP**. Do **not** move the change directory. Report failures; user fixes and re-runs archive.
+   - Vitest, AAA, no faking green. See **AGENTS.md**.
 
 4. **Assess delta spec sync state**
 
@@ -88,15 +88,9 @@ Archive a completed change in the experimental workflow.
    mv openspec/changes/<name> openspec/changes/archive/YYYY-MM-DD-<name>
    ```
 
-6. **Commit with context (see AGENTS.md workflow)**
+6. **Git close-out (mandatory — same session)**
 
-   Immediately after archiving, create one commit so the change is captured with a clear diff and message for future context.
-   - Stage all changes: `git add -A` (or stage only the relevant paths if the repo has other uncommitted files that should not be included).
-   - Run `git status` and optionally `git diff --cached` to summarize what is being committed.
-   - Commit using **conventional commits** and a descriptive message:
-     - **Title**: e.g. `feat(api): implement path-file-listing (cross-platform-path-file-listing)` or `chore(openspec): archive <change-name>`.
-     - **Body** (recommended): Short summary of what was implemented or archived; list main areas (e.g. path resolution, Nest module, DTOs). Optionally: "Context: archived OpenSpec change <name>."
-   - Example: `git commit -m "feat(api): path-file-listing" -m "Add path resolution, Nest module, DTOs. Context: archived cross-platform-path-file-listing."`
+   After a successful archive, execute **Git close-out** per **`.cursor/commands/opsx-archive.md`** step **8** (same session unless the user opts out). **AGENTS.md** § Workflow.
 
 7. **Display summary**
 
@@ -118,11 +112,13 @@ Archive a completed change in the experimental workflow.
 **Specs:** ✓ Synced to main specs (or "No delta specs" or "Sync skipped")
 
 All artifacts complete. All tasks complete.
+
+Git: conventional commit + merge to integration branch + checkout completed (`/opsx:archive` step 8).
 ```
 
 **Guardrails**
 - **Block archive** if `npm test` fails; do not proceed to move the change directory
-- After archive, always perform the commit step so the diff and message provide good context for Cursor and future readers.
+- After archive, run **opsx-archive step 8** unless the user opts out (**AGENTS.md** § Workflow)
 - Always prompt for change selection if not provided
 - Use artifact graph (openspec status --json) for completion checking
 - Don't block archive on other warnings (incomplete tasks with user confirm) except **failing unit tests** — those always block

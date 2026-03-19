@@ -12,7 +12,7 @@ I'll create a change with artifacts:
 - design.md (how)
 - tasks.md (implementation steps)
 
-When ready to implement, run /opsx:apply
+When ready to implement, run **`/opsx:apply`**. Full Git + OpenSpec lifecycle: **AGENTS.md** § Workflow.
 
 ---
 
@@ -94,7 +94,7 @@ After completing all artifacts, summarize:
 - Change name and location
 - List of artifacts created with brief descriptions
 - What's ready: "All artifacts created! Ready for implementation."
-- Prompt: "Run `/opsx:apply` to start implementing."
+- Prompt: "Run `/opsx:apply` to start implementing. See **AGENTS.md** § Workflow for branch and close-out."
 
 **Artifact Creation Guidelines**
 

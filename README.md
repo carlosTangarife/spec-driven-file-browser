@@ -50,6 +50,7 @@ file-browser-workspace/
 
 ## Conventions
 
+- **Git**: Default integration branch is **`trunk`** (trunk-based workflow; `npm run git:feature` and **`AGENTS.md`**). Fallback to `main` / `master` if `trunk` is absent locally.
 - **API**: feature-based modules (e.g. `file-listing`); SOLID and Screaming Architecture.
 - **Web**: UI components are presentational (no business logic); data and logic live in services and React Query hooks.
 

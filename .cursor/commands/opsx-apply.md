@@ -2,14 +2,35 @@
 name: /opsx-apply
 id: opsx-apply
 category: Workflow
-description: Implement tasks from an OpenSpec change (Experimental)
+description: Implement tasks from an OpenSpec change — feature branch + tasks (Experimental)
 ---
 
-Implement tasks from an OpenSpec change.
+Implement tasks from an OpenSpec change. This command **includes** creating or switching to **`feature/<change-name>`** (no separate Git command file). Finish workflow (archive + commit + merge): **`/opsx:archive`**.
 
 **Input**: Optionally specify a change name (e.g., `/opsx:apply add-auth`). If omitted, check if it can be inferred from conversation context. If vague or ambiguous you MUST prompt for available changes.
 
-**Git (automatic)** — As part of this command, the agent **MUST** create or switch to **`feature/<change-name>`** using the OpenSpec change **id** (same as `openspec/changes/<name>/` and **`proposal.md`** for that change — use the folder name, not the proposal title). Run **`npm run git:feature -- <name>`** from the OpenSpec workspace root after the change is selected. The user does **not** run **`/feat-start-change`** separately when using apply.
+---
+
+## Git — feature branch (normative)
+
+Work happens on **`feature/<change-name>`**, not on the integration branch. The **change name** is the OpenSpec change **id** (folder under `openspec/changes/<name>/` that contains **`proposal.md`** — use that id, not the proposal title).
+
+**Agent MUST:**
+
+1. `git rev-parse --is-inside-work-tree` — fail if not a repo.
+2. After the change name is known (step **Select the change** below):
+   - If already on **`feature/<name>`** for this change, skip branch creation.
+   - Else from the **repository root** (directory with `openspec/`), run **`npm run git:feature -- <name>`** (same `<name>` as step 1; the script also supports **no** args when exactly one active change exists, but apply always has an explicit name after selection).
+3. **Integration branch** resolution for the script is **`trunk`** → **`main`** → **`master`** (see **`scripts/git-feature-from-trunk.mjs`**).
+4. On failure (e.g. dirty working tree), **stop** and report — do not implement on **`trunk`** / **`main`** / **`master`**.
+5. If **`npm`** is unavailable, replicate **`scripts/git-feature-from-trunk.mjs`** behavior.
+6. Announce: **Branch ready: `feature/<name>`**.
+
+**Without running apply’s branch step:** If work started manually, run **`npm run git:feature -- <name>`** (or **`npm run git:feature`** when exactly one active change) **before** continuing with apply from **Check status** onward; same rules as above.
+
+**When done:** **`/opsx:archive`** (archives OpenSpec and runs commit + merge to integration branch in the same session by default). Details: **AGENTS.md** § Workflow.
+
+---
 
 **Steps**
 
@@ -22,11 +43,9 @@ Implement tasks from an OpenSpec change.
 
    Always announce: "Using change: <name>" and how to override (e.g., `/opsx:apply <other>`).
 
-2. **Create or switch to `feature/<name>` (automatic)**
+2. **Create or switch to `feature/<name>`**
 
-   - If already on **`feature/<name>`** for this change, skip.
-   - Else run **`npm run git:feature -- <name>`** from the workspace that contains `openspec/` (see **AGENTS.md**). On failure (e.g. dirty tree), stop and report.
-   - Announce the current branch.
+   Follow **Git — feature branch** above.
 
 3. **Check status to understand the schema**
    ```bash
@@ -50,7 +69,7 @@ Implement tasks from an OpenSpec change.
 
    **Handle states:**
    - If `state: "blocked"` (missing artifacts): show message, suggest using `/opsx:continue`
-   - If `state: "all_done"`: congratulate, suggest archive
+   - If `state: "all_done"`: congratulate, suggest **`/opsx:archive`**
    - Otherwise: proceed to implementation
 
 5. **Read context files**
@@ -88,7 +107,7 @@ Implement tasks from an OpenSpec change.
    Display:
    - Tasks completed this session
    - Overall progress: "N/M tasks complete"
-   - If all done: suggest archive
+   - If all done: suggest **`/opsx:archive`**
    - If paused: explain why and wait for guidance
 
 **Output During Implementation**
@@ -119,7 +138,7 @@ Working on task 4/7: <task description>
 - [x] Task 2
 ...
 
-All tasks complete! You can archive this change with `/opsx:archive`.
+All tasks complete! Next: **`/opsx:archive`** (see **AGENTS.md** § Workflow).
 ```
 
 **Output On Pause (Issue Encountered)**
