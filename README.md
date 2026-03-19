@@ -17,6 +17,10 @@ Screenshots (repository root with `package.json` selected — preview shows JSON
 |---------|---------------------------|
 | ![Desktop — tree + preview](./docs/readme/file-browser-desktop.png) | ![Mobile layout](./docs/readme/file-browser-mobile.png) |
 
+On **narrow viewports**, selecting a file opens the **text preview in a modal** (overlay, path + filename in the header, close control). Example (`node_modules/.bin/conc`):
+
+![Mobile — preview modal](./docs/readme/file-browser-mobile-preview-modal.png)
+
 With a file open in the preview panel (example: `.cursor/commands/opsx-apply.md`):
 
 ![Preview pane with file contents](./docs/readme/file-browser-preview.png)
@@ -38,8 +42,15 @@ Features are developed as **OpenSpec changes** under `openspec/changes/<change-i
 
 ## Commands
 
+After cloning (or when **`pnpm-lock.yaml`** changes), install dependencies from the repository root:
+
+```bash
+pnpm install
+```
+
 | Command | Description |
 |--------|-------------|
+| `pnpm install` | Install dependencies (run after clone or lockfile updates) |
 | `pnpm run dev` | API + web (API first, then Vite on port 4200) |
 | `pnpm run serve:api` | NestJS API → `http://localhost:3000/api` |
 | `pnpm run serve:web` | Vite dev server → `http://localhost:4200` (proxies `/api` to 3000) |
@@ -74,6 +85,10 @@ If you see a JSON 404 at `/api/docs` (`Cannot GET /api/docs`), Swagger is not mo
 
 Suppose you want a **download** action for the selected file (business-relevant, fits the file browser).
 
+0. **Dependencies** (once per clone)
+   ```bash
+   pnpm install
+   ```
 1. **Branch + OpenSpec change**
    ```bash
    pnpm run git:feature -- file-browser-file-download

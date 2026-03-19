@@ -11,6 +11,8 @@ Archive a completed change and **finish Git in the same session** (conventional 
 
 Normative workflow context: **AGENTS.md** § Workflow.
 
+**Setup:** On a new clone or after lockfile changes, run **`pnpm install`** from the repository root before **`pnpm run verify`** or e2e (see **README** — Commands).
+
 ---
 
 **Steps**

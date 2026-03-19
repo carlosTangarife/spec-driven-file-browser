@@ -9,6 +9,8 @@ Propose a new change - create the change and generate all artifacts in one step.
 
 This command **includes** creating or switching to **`feature/<change-name>`** before **`openspec new change`** (idempotent if you are already on the right branch). **`/opsx:apply`** runs the same ensure step again for safety.
 
+**Setup:** On a new clone or after lockfile changes, run **`pnpm install`** from the repository root before other **`pnpm`** commands (see **README** — Commands).
+
 I'll create a change with artifacts:
 - proposal.md (what & why)
 - design.md (how)

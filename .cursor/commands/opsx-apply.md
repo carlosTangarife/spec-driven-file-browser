@@ -7,6 +7,8 @@ description: Implement tasks from an OpenSpec change — ensure feature branch +
 
 Implement tasks from an OpenSpec change. **`/opsx:propose`** normally **already** created **`feature/<change-name>`**; this command **ensures** you are on that branch (idempotent — same `pnpm run git:feature` step). Finish workflow (archive + commit + merge): **`/opsx:archive`**.
 
+**Setup:** On a new clone or after lockfile changes, run **`pnpm install`** from the repository root before other **`pnpm`** commands (see **README** — Commands).
+
 **Input**: Optionally specify a change name (e.g., `/opsx:apply add-auth`). If omitted, check if it can be inferred from conversation context. If vague or ambiguous you MUST prompt for available changes.
 
 ---
