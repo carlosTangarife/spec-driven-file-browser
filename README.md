@@ -2,9 +2,9 @@
 
 Nx monorepo with **NestJS 11** (API) and **React 18** (web): browse files and folders under a configurable **allowed root** on the host, preview UTF-8 text files, and keep behavior **spec-driven** with **OpenSpec**.
 
-## Package manager
+## Runtime and package manager
 
-This repo uses **pnpm** only: **`pnpm-lock.yaml`** at the root is the single lockfile. Use **[Corepack](https://nodejs.org/api/corepack.html)** (`corepack enable`) so the **`packageManager`** field in **`package.json`** pins **pnpm 9** — do not commit **`package-lock.json`** or **`yarn.lock`**.
+The workspace **runtime** is **Node.js** (see supported versions in **`package.json`** → **`engines`**). **pnpm** is the only supported package manager: **`pnpm-lock.yaml`** at the root is the single lockfile. Use **[Corepack](https://nodejs.org/api/corepack.html)** (`corepack enable`) so the **`packageManager`** field in **`package.json`** pins **pnpm 9** — do not commit **`package-lock.json`** or **`yarn.lock`**.
 
 ## What this project is
 
@@ -29,6 +29,7 @@ Features are developed as **OpenSpec changes** under `openspec/changes/<change-i
 
 | Layer | Technology |
 |-------|------------|
+| Runtime / tooling | **Node.js**, **pnpm** (versions: **`package.json`** → **`engines`**, **`packageManager`**) |
 | Monorepo | **Nx** |
 | API | **NestJS 11**, **Swagger** (`/api/docs`) |
 | Web | **React 18**, **Vite**, **Chakra UI**, **TanStack Query** |
