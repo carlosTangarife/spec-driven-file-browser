@@ -8,13 +8,9 @@ context: |
   Paths must be handled in a cross-platform way (Windows and macOS/Linux) using Node path APIs and clear normalization rules.
   Workflow (proposal → apply on feature branch from trunk → work → archive → commit with good message): see AGENTS.md.
   Coding rules: vertical slices only. React: one folder per feature, presentational UI + services/hooks. NestJS: one folder per feature (module, controller, service, DTOs). Full rules in AGENTS.md.
+  Unit tests: mandatory after implementation. Vitest + AAA for apps/api and apps/web when touched. npm test must pass before apply/archive is complete. Never skip or ignore failing tests.
 
-# Per-artifact rules (optional)
-# Add custom rules for specific artifacts.
-# Example:
-#   rules:
-#     proposal:
-#       - Keep proposals under 500 words
-#       - Always include a "Non-goals" section
-#     tasks:
-#       - Break tasks into chunks of max 2 hours
+rules:
+  tasks:
+    - Include tasks for Vitest unit tests (AAA) on api and/or web when the change affects those apps.
+    - Do not treat implementation as done until npm test passes (nx test api, nx test web as needed).

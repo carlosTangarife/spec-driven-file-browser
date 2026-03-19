@@ -9,8 +9,9 @@ This document is the **single source of truth** for business context, **workflow
    - **Trunk-based**: From a clean **trunk** (e.g. `main` / `master`), create a **feature branch**: `feature/<change-name>` (kebab-case from the OpenSpec change name). All implementation happens on this branch.
    - Do not implement on trunk; always work on the feature branch created at apply time.
 3. **Work** — Implement tasks from `tasks.md` on that feature branch; keep commits focused.
-4. **Archive** — When the change is done, run archive (e.g. `/opsx:archive` or openspec-archive-change). The change directory moves to `openspec/changes/archive/YYYY-MM-DD-<change-name>/`.
-5. **Commit after archive** — **Immediately after** archiving, create a **single commit** with:
+4. **Unit tests (mandatory)** — After each feature slice (and before considering **apply** or **archive** complete), add or update **unit tests** for both **`apps/api`** and **`apps/web`** that touch the change. Use the **AAA** pattern (Arrange, Act, Assert) in every test. Stack: **Vitest** (same runner for API Node tests and web). Run `npm test` (or `nx test api` and `nx test web`). **Do not skip, ignore, or disable tests** to “pass” the build; if tests fail, **iterate until green**. A change is **not** done while `api:test` or `web:test` fails. No `passWithNoTests: true` workaround for projects that must have coverage for the feature.
+5. **Archive** — When the change is done **and all unit tests pass**, run archive (e.g. `/opsx:archive` or openspec-archive-change). The change directory moves to `openspec/changes/archive/YYYY-MM-DD-<change-name>/`.
+6. **Commit after archive** — **Immediately after** archiving, create a **single commit** with:
    - **Staged changes**: All modified/added/deleted files (e.g. `git add -A`).
    - **Message**: Use **conventional commits** and a **clear summary** so the diff is self-explanatory. Example:
      - Title: `feat(api): implement path-file-listing (cross-platform-path-file-listing)`
@@ -40,6 +41,7 @@ The product is a **file browser**: the API is the source of truth for the listin
 | API       | **NestJS 11** | REST API; feature-based modules; SOLID, Screaming Architecture. |
 | Frontend  | **React 18**  | Vite; **Chakra UI** for components and layout; **React Query** for server state; **Zod** for validation; presentational UI. |
 | Language  | **TypeScript** | Strict; shared via `tsconfig.base.json`. |
+| Unit tests | **Vitest** | AAA pattern; `apps/api` (node) and `apps/web` (jsdom); `npm test` gates apply/archive. |
 
 ## Architecture principles
 
@@ -70,6 +72,7 @@ Folder and file names must **scream what the application does** (domain and capa
   - **One place** for “how we show errors”: e.g. a shared `QueryErrorBoundary` or a small `useQuery` wrapper that maps errors to a common shape; components only render `error` from the hook or an error boundary. Avoid try/catch and ad-hoc error UI in each screen.
 - **Presentational components**: Receive data and callbacks via props only; no `fetch`, no React Query, no business logic. Only render and delegate events. Logic stays in hooks and services.
 - **Exports**: Named exports only; file name matches main export (e.g. `FileList.tsx` → `export const FileList`).
+- **Unit tests**: Co-locate `*.spec.ts` / `*.test.ts(x)` next to services and pure helpers; **Vitest** + **AAA**; mock `fetch` and browser APIs in jsdom as needed.
 
 ## NestJS rules (apps/api)
 
@@ -79,6 +82,7 @@ Folder and file names must **scream what the application does** (domain and capa
 - **Service**: All business logic, path resolution, `fs`/`readdir`, validation against allowed root. Injectable and testable without HTTP. Single responsibility per service (one service per feature or sub-capability).
 - **Small, focused modules**: One feature per module. If a module grows too large, split by sub-capability (new folder, new module), not by adding more controllers/services in the same folder.
 - **No horizontal folders**: Do not create top-level `controllers/`, `services/`, `modules/` that group by technical layer; structure by feature so the app “screams” what it does.
+- **Unit tests**: Co-locate `*.spec.ts` next to services and pure modules (e.g. path resolution); **Vitest** (Node environment) + **AAA**; test business logic without HTTP where possible.
 
 ## Repo layout (relevant)
 

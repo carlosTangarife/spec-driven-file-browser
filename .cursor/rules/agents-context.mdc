@@ -14,3 +14,5 @@ When implementing OpenSpec changes or writing React/NestJS code in this workspac
 - **NestJS**: One folder per feature (module, controller, service, DTOs); no horizontal `controllers/` or `services/` folders; controller = HTTP only, service = business logic.
 
 Do not implement behavior outside `openspec/changes/<change>/` specs; do not add horizontal layers that mix features.
+
+**Unit tests (non-negotiable):** After implementing a feature, add/update Vitest unit tests with **AAA** for both `apps/api` and `apps/web` when those apps are affected. Run `npm test` (or `nx test api` and `nx test web`). Apply and archive are **not** complete if tests fail; fix and iterate — do not skip or ignore tests.

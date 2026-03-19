@@ -50,6 +50,12 @@ Archive a completed change in the experimental workflow.
 
    **If no tasks file exists:** Proceed without task-related warning.
 
+3.5. **Run unit tests (mandatory — block archive if red)**
+
+   Run **`npm test`** (or `nx test api` and `nx test web` as appropriate for the change scope).
+   - If **any test fails**: **STOP**. Do **not** archive. Report failures and instruct the user to fix and re-run apply until green.
+   - Archive is only allowed when unit tests pass. Same rules as apply: Vitest, AAA, no skipped tests to fake success.
+
 4. **Assess delta spec sync state**
 
    Check for delta specs at `openspec/changes/<name>/specs/`. If none exist, proceed without sync prompt.
@@ -65,7 +71,7 @@ Archive a completed change in the experimental workflow.
 
    If user chooses sync, use Task tool (subagent_type: "general-purpose", prompt: "Use Skill tool to invoke openspec-sync-specs for change '<name>'. Delta spec analysis: <include the analyzed delta spec summary>"). Proceed to archive regardless of choice.
 
-5. **Perform the archive**
+5. **Perform the archive** (only after step 3.5 tests passed)
 
    Create the archive directory if it doesn't exist:
    ```bash
@@ -115,10 +121,11 @@ All artifacts complete. All tasks complete.
 ```
 
 **Guardrails**
+- **Block archive** if `npm test` fails; do not proceed to move the change directory
 - After archive, always perform the commit step so the diff and message provide good context for Cursor and future readers.
 - Always prompt for change selection if not provided
 - Use artifact graph (openspec status --json) for completion checking
-- Don't block archive on warnings - just inform and confirm
+- Don't block archive on other warnings (incomplete tasks with user confirm) except **failing unit tests** — those always block
 - Preserve .openspec.yaml when moving to archive (it moves with the directory)
 - Show clear summary of what happened
 - If sync is requested, use openspec-sync-specs approach (agent-driven)

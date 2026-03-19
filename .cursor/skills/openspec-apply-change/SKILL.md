@@ -90,12 +90,22 @@ Implement tasks from an OpenSpec change.
    - Error or blocker encountered → report and wait for guidance
    - User interrupts
 
-8. **On completion or pause, show status**
+8. **Run unit tests (mandatory — see AGENTS.md)**
+
+   After implementation work for this session (and **before** declaring apply complete or suggesting archive):
+   - Run **`npm test`** (runs `nx run-many -t test --projects=api,web`) or run **`nx test api`** and **`nx test web`** when only one app changed.
+   - Tests MUST use **Vitest** and the **AAA** pattern (Arrange, Act, Assert) for new or changed behavior in `apps/api` and `apps/web`.
+   - If any test fails: **fix code or tests and re-run** until green. **Do not** skip, `.skip`, or disable tests; **do not** use `passWithNoTests: true` to bypass empty suites for apps that must cover the feature.
+   - **Apply is not complete** while `api:test` or `web:test` fails for projects in scope of the change.
+
+9. **On completion or pause, show status**
 
    Display:
    - Tasks completed this session
    - Overall progress: "N/M tasks complete"
-   - If all done: suggest archive
+   - **Unit tests:** pass/fail summary (`npm test` output)
+   - If all tasks done **and tests green**: suggest archive
+   - If tests red: report failures and iterate — do not suggest archive
    - If paused: explain why and wait for guidance
 
 **Output During Implementation**
@@ -126,7 +136,7 @@ Working on task 4/7: <task description>
 - [x] Task 2
 ...
 
-All tasks complete! Ready to archive this change.
+All tasks complete and unit tests passed (`npm test`). Ready to archive this change.
 ```
 
 **Output On Pause (Issue Encountered)**
@@ -150,6 +160,7 @@ What would you like to do?
 ```
 
 **Guardrails**
+- Never declare implementation complete or suggest archive until **`npm test`** (or scoped `nx test`) passes for affected apps
 - Keep going through tasks until done or blocked
 - Always read context files before starting (from the apply instructions output)
 - If task is ambiguous, pause and ask before implementing

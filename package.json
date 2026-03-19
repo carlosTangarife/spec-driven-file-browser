@@ -7,7 +7,10 @@
     "serve:web": "nx serve web",
     "dev": "concurrently -k -n api,web \"nx serve api\" \"wait-on http://localhost:3000/api && nx serve web\"",
     "build:api": "nx build api",
-    "build:web": "nx build web"
+    "build:web": "nx build web",
+    "test": "nx run-many -t test --projects=api,web",
+    "test:api": "nx test api",
+    "test:web": "nx test web"
   },
   "private": true,
   "devDependencies": {

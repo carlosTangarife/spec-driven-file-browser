@@ -31,4 +31,11 @@ export default defineConfig(() => ({
       transformMixedEsModules: true,
     },
   },
+  test: {
+    name: 'web',
+    globals: true,
+    environment: 'jsdom',
+    include: ['src/**/*.{test,spec}.{ts,tsx}'],
+    passWithNoTests: false,
+  },
 }));

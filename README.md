@@ -17,6 +17,7 @@ Nx monorepo with **NestJS 11** (API) and **React 18** (web), following SOLID, Sc
 | `npm run serve:web` | Start React app (Vite dev server) |
 | `npm run build:api` | Build API for production |
 | `npm run build:web` | Build web app for production |
+| `npm test` | Run Vitest unit tests for **api** and **web** (required before OpenSpec archive) |
 
 Or with Nx:
 
@@ -24,6 +25,7 @@ Or with Nx:
 - `npx nx serve web`
 - `npx nx build api`
 - `npx nx build web`
+- `npx nx test api` / `npx nx test web` / `npm test`
 
 ## Structure
 
@@ -39,9 +41,16 @@ file-browser-workspace/
 └── openspec/         # OpenSpec change (file-listing-api-and-ui)
 ```
 
+## API configuration (path-file-listing)
+
+- **`FILE_LISTING_ALLOWED_ROOT`** (env): Absolute path on the host that the listing API is allowed to read. Default: `process.cwd()`. Traversal above this root is rejected.
+- **Symlink policy**: Do not follow symlinks when resolving the requested path. Children from `readdir` are returned as-is. See OpenSpec change `cross-platform-path-file-listing`.
+
+**Verification**: Manual or e2e: run `nx serve api`, then `GET http://localhost:3000/api/listing` (root) or `GET http://localhost:3000/api/listing?path=subfolder`. For CI, run `nx build api` and optionally `nx e2e api-e2e`. Unit tests for path resolution live in `apps/api/src/app/path-file-listing/path-resolver.spec.ts` (run with a Jest/Vitest target when configured for the api project).
+
 ## Conventions
 
 - **API**: feature-based modules (e.g. `file-listing`); SOLID and Screaming Architecture.
 - **Web**: UI components are presentational (no business logic); data and logic live in services and React Query hooks.
 
-Scope and tasks are defined in OpenSpec change `file-listing-api-and-ui`. When the first feature is defined, implement it under the corresponding app’s feature folder.
+Scope and tasks: OpenSpec changes under `openspec/changes/`. Path listing: **`cross-platform-path-file-listing`**.’s feature folder.
