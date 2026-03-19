@@ -2,10 +2,12 @@
 name: /opsx-propose
 id: opsx-propose
 category: Workflow
-description: Propose a new change - create it and generate all artifacts in one step
+description: Propose a new change - feature branch, create it, and generate all artifacts in one step
 ---
 
 Propose a new change - create the change and generate all artifacts in one step.
+
+This command **includes** creating or switching to **`feature/<change-name>`** before **`openspec new change`** (idempotent if you are already on the right branch). **`/opsx:apply`** runs the same ensure step again for safety.
 
 I'll create a change with artifacts:
 - proposal.md (what & why)
@@ -13,6 +15,25 @@ I'll create a change with artifacts:
 - tasks.md (implementation steps)
 
 When ready to implement, run **`/opsx:apply`**. Full Git + OpenSpec lifecycle: **AGENTS.md** § Workflow.
+
+---
+
+## Git — feature branch (normative)
+
+Work for this change happens on **`feature/<change-name>`**, not on the integration branch. The **change name** is the kebab-case id you will use for `openspec/changes/<name>/` (same as the OpenSpec change **id** — use that id, not a free-form title).
+
+**Agent MUST:**
+
+1. `git rev-parse --is-inside-work-tree` — fail if not a repo.
+2. After the change **`<name>`** is known (step **If no input provided…** below), **before** `openspec new change`:
+   - If already on **`feature/<name>`** for this change, skip branch creation.
+   - Else from the **repository root** (directory with `openspec/`), run **`npm run git:feature -- <name>`**.
+3. **Integration branch** resolution for the script is **`trunk`** → **`main`** → **`master`** (see **`scripts/git-feature-from-trunk.mjs`**).
+4. On failure (e.g. dirty working tree), **stop** and report — do not create the change on **`trunk`** / **`main`** / **`master`**.
+5. If **`npm`** is unavailable, replicate **`scripts/git-feature-from-trunk.mjs`** behavior.
+6. Announce: **Branch ready: `feature/<name>`**.
+
+**Without this step:** If artifacts were created manually on the wrong branch, run **`npm run git:feature -- <name>`** (or move work as appropriate) before continuing; **`/opsx:apply`** also **ensures** the feature branch if you skipped propose’s Git step.
 
 ---
 
@@ -37,13 +58,17 @@ When ready to implement, run **`/opsx:apply`**. Full Git + OpenSpec lifecycle: *
 
    **IMPORTANT**: Do NOT proceed without understanding what the user wants to build.
 
-2. **Create the change directory**
+2. **Create or switch to `feature/<name>`**
+
+   Follow **Git — feature branch** above.
+
+3. **Create the change directory**
    ```bash
    openspec new change "<name>"
    ```
    This creates a scaffolded change at `openspec/changes/<name>/` with `.openspec.yaml`.
 
-3. **Get the artifact build order**
+4. **Get the artifact build order**
    ```bash
    openspec status --change "<name>" --json
    ```
@@ -51,7 +76,7 @@ When ready to implement, run **`/opsx:apply`**. Full Git + OpenSpec lifecycle: *
    - `applyRequires`: array of artifact IDs needed before implementation (e.g., `["tasks"]`)
    - `artifacts`: list of all artifacts with their status and dependencies
 
-4. **Create artifacts in sequence until apply-ready**
+5. **Create artifacts in sequence until apply-ready**
 
    Use the **TodoWrite tool** to track progress through the artifacts.
 
@@ -83,7 +108,7 @@ When ready to implement, run **`/opsx:apply`**. Full Git + OpenSpec lifecycle: *
       - Use **AskUserQuestion tool** to clarify
       - Then continue with creation
 
-5. **Show final status**
+6. **Show final status**
    ```bash
    openspec status --change "<name>"
    ```
@@ -94,7 +119,8 @@ After completing all artifacts, summarize:
 - Change name and location
 - List of artifacts created with brief descriptions
 - What's ready: "All artifacts created! Ready for implementation."
-- Prompt: "Run `/opsx:apply` to start implementing. See **AGENTS.md** § Workflow for branch and close-out."
+- Note: **`feature/<name>`** should already exist from this command; **`/opsx:apply`** will still ensure you are on it.
+- Prompt: "Run `/opsx:apply` to start implementing. See **AGENTS.md** § Workflow for close-out (**`/opsx:archive`**)."
 
 **Artifact Creation Guidelines**
 

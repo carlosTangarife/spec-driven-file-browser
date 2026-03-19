@@ -24,7 +24,9 @@ Implement tasks from an OpenSpec change.
 
    Always announce: "Using change: <name>" and how to override (e.g., `/opsx:apply <other>`).
 
-2. **Create the feature branch automatically (mandatory — no separate user step)**
+2. **Ensure the feature branch (mandatory — idempotent)**
+
+   **`/opsx:propose`** usually created **`feature/<name>`** already; this step matches that behavior for manual or legacy flows.
 
    The selected **`<name>`** is the OpenSpec change id: same as `openspec/changes/<name>/` and the folder that contains **`proposal.md`**. The Git branch **MUST** be **`feature/<name>`** — do not parse the proposal title; use the change id from step 1.
 
@@ -36,7 +38,7 @@ Implement tasks from an OpenSpec change.
      This creates or checks out `feature/<name>` from the integration branch (**`trunk`**, else **`main`**, else **`master`**) per **AGENTS.md** and `scripts/git-feature-from-trunk.mjs`.
    - If the script is unavailable, replicate its behavior with git (checkout integration branch, pull, `git checkout -b feature/<name>` or checkout existing).
    - If the command fails (e.g. dirty working tree), **stop**, report the error, and wait — do not implement on the integration branch (`trunk` / `main` / `master`).
-   - Announce: **Branch ready: `feature/<name>`** (branch steps are part of **`/opsx:apply`** — see **`.cursor/commands/opsx-apply.md`**).
+   - Announce: **Branch ready: `feature/<name>`** or **Already on `feature/<name>`** (see **`.cursor/commands/opsx-apply.md`**).
 
 3. **Check status to understand the schema**
    ```bash

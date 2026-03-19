@@ -11,6 +11,8 @@ metadata:
 
 Propose a new change - create the change and generate all artifacts in one step.
 
+After the change **`<name>`** is known, **before** `openspec new change`, create or switch to **`feature/<name>`** via **`npm run git:feature -- <name>`** from the repo root (same rules as **`.cursor/commands/opsx-propose.md`** and **`scripts/git-feature-from-trunk.mjs`**). **`/opsx:apply`** repeats this ensure step.
+
 I'll create a change with artifacts:
 - proposal.md (what & why)
 - design.md (how)
@@ -37,13 +39,17 @@ When ready to implement, run /opsx:apply
 
    **IMPORTANT**: Do NOT proceed without understanding what the user wants to build.
 
-2. **Create the change directory**
+2. **Create or switch to `feature/<name>`**
+
+   From the OpenSpec workspace root: **`npm run git:feature -- <name>`** (or replicate `scripts/git-feature-from-trunk.mjs` if npm is unavailable). If already on **`feature/<name>`**, skip. On failure (e.g. dirty tree), stop and report.
+
+3. **Create the change directory**
    ```bash
    openspec new change "<name>"
    ```
    This creates a scaffolded change at `openspec/changes/<name>/` with `.openspec.yaml`.
 
-3. **Get the artifact build order**
+4. **Get the artifact build order**
    ```bash
    openspec status --change "<name>" --json
    ```
@@ -51,7 +57,7 @@ When ready to implement, run /opsx:apply
    - `applyRequires`: array of artifact IDs needed before implementation (e.g., `["tasks"]`)
    - `artifacts`: list of all artifacts with their status and dependencies
 
-4. **Create artifacts in sequence until apply-ready**
+5. **Create artifacts in sequence until apply-ready**
 
    Use the **TodoWrite tool** to track progress through the artifacts.
 
@@ -83,7 +89,7 @@ When ready to implement, run /opsx:apply
       - Use **AskUserQuestion tool** to clarify
       - Then continue with creation
 
-5. **Show final status**
+6. **Show final status**
    ```bash
    openspec status --change "<name>"
    ```

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Creates `feature/<kebab-name>` from the integration branch (prefer `trunk`, else `main`, else `master`) and checks it out.
- * Aligns with AGENTS.md: OpenSpec implementation happens on a feature branch, not on trunk.
+ * Aligns with AGENTS.md: OpenSpec work happens on a feature branch, not on trunk. `/opsx:propose` runs this before `openspec new change`; `/opsx:apply` repeats the same ensure step.
  *
  * Usage:
  *   node scripts/git-feature-from-trunk.mjs

@@ -7,23 +7,24 @@ This document is the **single source of truth** for business context, **workflow
 **Integration branch (default base):** **`trunk`**. Tooling resolves the merge base in order **`trunk`** → **`main`** → **`master`** when a local branch is missing (see `scripts/git-feature-from-trunk.mjs`). **`nx.json`** `defaultBase` is **`trunk`**.
 
 1. **Proposal** — Create or refine the change with OpenSpec: `proposal` → `design` → `specs` → `tasks` (e.g. `/opsx:propose` or openspec-propose skill).
-2. **Apply** — When starting implementation (`/opsx:apply` or openspec-apply-change):
    - **Trunk-based**: Work happens on **`feature/<change-name>`**, not on trunk. The **change name** is the OpenSpec change **id** (folder under `openspec/changes/<change-name>/` where **`proposal.md`** lives — use that id, not the proposal title).
-   - **Automatic branch (recommended path)**: **`/opsx:apply`** **creates or checks out** `feature/<change-name>` via **`npm run git:feature -- <change-name>`** (see **`.cursor/commands/opsx-apply.md`**) right after the change is selected.
-   - **Without apply’s branch step**: Run **`npm run git:feature`** / **`npm run git:feature -- <change-name>`** first (infer name when exactly one active change exists), then continue implementation; or run **`/opsx:apply`** from **Check status** onward if appropriate.
+   - **Automatic branch (recommended path)**: **`/opsx:propose`** **creates or checks out** `feature/<change-name>` via **`npm run git:feature -- <change-name>`** (see **`.cursor/commands/opsx-propose.md`**) **before** `openspec new change`, once the change id is known.
+2. **Apply** — When starting implementation (`/opsx:apply` or openspec-apply-change):
+   - **`/opsx:apply`** **ensures** the same `feature/<change-name>` (idempotent; see **`.cursor/commands/opsx-apply.md`**) right after the change is selected — covers legacy flows or manual OpenSpec without propose.
+   - **Without either command’s branch step**: Run **`npm run git:feature`** / **`npm run git:feature -- <change-name>`** first (infer name when exactly one active change exists), then continue; or run **`/opsx:apply`** from **Check status** onward if appropriate.
 3. **Work** — Implement tasks from `tasks.md` on that feature branch; keep commits focused.
 4. **Unit tests (mandatory)** — After each feature slice (and before considering **apply** or **archive** complete), add or update **unit tests** for both **`apps/api`** and **`apps/web`** that touch the change. Use the **AAA** pattern (Arrange, Act, Assert) in every test. Stack: **Vitest** (same runner for API Node tests and web). Run `npm test` (or `nx test api` and `nx test web`). **Do not skip, ignore, or disable tests** to “pass” the build; if tests fail, **iterate until green**. A change is **not** done while `api:test` or `web:test` fails. No `passWithNoTests: true` workaround for projects that must have coverage for the feature.
 5. **Archive and land on trunk** — When the change is done **and all unit tests pass**:
    - Run **`/opsx:archive`** (or **openspec-archive-change**). Moves `openspec/changes/<change-name>/` → `openspec/changes/archive/YYYY-MM-DD-<change-name>/` (and syncs delta specs when applicable).
    - **Immediately after**, in the same session, **`/opsx:archive`** includes **Git close-out**: **conventional commit** on **`feature/<change-name>`**, **merge into the integration branch** (default **`trunk`**), **checkout** that branch — see **`.cursor/commands/opsx-archive.md`** step **8**. Archive **cannot** proceed without **unit tests for `api` and `web` passing** (step **5** in that command). Opt out of Git only if the user explicitly wants OpenSpec archive **without** Git.
-6. **Next change** — From the integration branch (**`trunk`** by default), use **`npm run git:feature -- <next-change-name>`** (or **`npm run git:feature`** when one active change) when you need the feature branch before **`/opsx:apply`**, then **`/opsx:apply`** as usual.
+6. **Next change** — From the integration branch (**`trunk`** by default), start the next cycle with **`/opsx:propose`** (which creates **`feature/<next-change-name>`**) or run **`npm run git:feature -- <next-change-name>`** / **`npm run git:feature`** when appropriate, then **`/opsx:apply`** as usual.
 
 ### Cursor command cheat sheet (Git + OpenSpec)
 
 | Goal | Command |
 |------|---------|
-| Proposal + artifacts | **`/opsx:propose`** (or OpenSpec CLI) |
-| Feature branch + implement tasks | **`/opsx:apply`** (Git steps in that command). Manual branch first: **`npm run git:feature`** / **`npm run git:feature -- <name>`** |
+| Proposal + feature branch + artifacts | **`/opsx:propose`** (or: manual **`npm run git:feature -- <name>`** then OpenSpec CLI) |
+| Implement tasks (ensures feature branch) | **`/opsx:apply`**. If you skipped propose’s Git step: **`npm run git:feature`** / **`npm run git:feature -- <name>`** first |
 | Archive OpenSpec + commit + merge + integration branch | **`/opsx:archive`** (tests **`api`+`web`** then archive + Git close-out — **`.cursor/commands/opsx-archive.md`**) |
 
 ## Business objective

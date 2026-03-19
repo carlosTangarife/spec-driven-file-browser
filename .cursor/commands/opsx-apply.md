@@ -2,20 +2,22 @@
 name: /opsx-apply
 id: opsx-apply
 category: Workflow
-description: Implement tasks from an OpenSpec change — feature branch + tasks (Experimental)
+description: Implement tasks from an OpenSpec change — ensure feature branch + tasks (Experimental)
 ---
 
-Implement tasks from an OpenSpec change. This command **includes** creating or switching to **`feature/<change-name>`** (no separate Git command file). Finish workflow (archive + commit + merge): **`/opsx:archive`**.
+Implement tasks from an OpenSpec change. **`/opsx:propose`** normally **already** created **`feature/<change-name>`**; this command **ensures** you are on that branch (idempotent — same `npm run git:feature` step). Finish workflow (archive + commit + merge): **`/opsx:archive`**.
 
 **Input**: Optionally specify a change name (e.g., `/opsx:apply add-auth`). If omitted, check if it can be inferred from conversation context. If vague or ambiguous you MUST prompt for available changes.
 
 ---
 
-## Git — feature branch (normative)
+## Git — ensure feature branch (normative)
 
 Work happens on **`feature/<change-name>`**, not on the integration branch. The **change name** is the OpenSpec change **id** (folder under `openspec/changes/<name>/` that contains **`proposal.md`** — use that id, not the proposal title).
 
-**Agent MUST:**
+**Primary path:** **`/opsx:propose`** already created **`feature/<name>`** — you are usually already checked out there.
+
+**Agent MUST** (same behavior as propose; keeps legacy and manual flows safe):
 
 1. `git rev-parse --is-inside-work-tree` — fail if not a repo.
 2. After the change name is known (step **Select the change** below):
@@ -24,9 +26,9 @@ Work happens on **`feature/<change-name>`**, not on the integration branch. The 
 3. **Integration branch** resolution for the script is **`trunk`** → **`main`** → **`master`** (see **`scripts/git-feature-from-trunk.mjs`**).
 4. On failure (e.g. dirty working tree), **stop** and report — do not implement on **`trunk`** / **`main`** / **`master`**.
 5. If **`npm`** is unavailable, replicate **`scripts/git-feature-from-trunk.mjs`** behavior.
-6. Announce: **Branch ready: `feature/<name>`**.
+6. Announce: **Branch ready: `feature/<name>`** (or **Already on `feature/<name>`**).
 
-**Without running apply’s branch step:** If work started manually, run **`npm run git:feature -- <name>`** (or **`npm run git:feature`** when exactly one active change) **before** continuing with apply from **Check status** onward; same rules as above.
+**If you skipped propose’s branch step:** Run **`npm run git:feature -- <name>`** (or **`npm run git:feature`** when exactly one active change) **before** continuing from **Check status** onward; same rules as above. See also **`.cursor/commands/opsx-propose.md`** § Git — feature branch.
 
 **When done:** **`/opsx:archive`** (archives OpenSpec and runs commit + merge to integration branch in the same session by default). Details: **AGENTS.md** § Workflow.
 
@@ -43,9 +45,9 @@ Work happens on **`feature/<change-name>`**, not on the integration branch. The 
 
    Always announce: "Using change: <name>" and how to override (e.g., `/opsx:apply <other>`).
 
-2. **Create or switch to `feature/<name>`**
+2. **Ensure `feature/<name>`**
 
-   Follow **Git — feature branch** above.
+   Follow **Git — ensure feature branch** above.
 
 3. **Check status to understand the schema**
    ```bash
