@@ -1,0 +1,16 @@
+---
+description: Project context, OpenSpec+Git workflow, Screaming Architecture, and React/NestJS rules. Read AGENTS.md before implementing or reviewing code.
+globs: ["**/*.ts", "**/*.tsx", "**/openspec/**"]
+alwaysApply: true
+---
+
+# Workspace context and rules
+
+When implementing OpenSpec changes or writing React/NestJS code in this workspace, **read [AGENTS.md](../../AGENTS.md)** (workspace root). It is the single source of truth for:
+
+- **Workflow**: Proposal → Apply (feature branch from trunk) → Work → Archive → Commit with conventional message and diff context.
+- **Screaming Architecture**: Folder names scream what the app does (e.g. `file-browser/`, `path-file-listing/`), not framework layers (`components/`, `controllers/`).
+- **React**: Chakra UI for UI; mobile-first, fluid, pleasant UX; use a dedicated component for folders/files (e.g. tree or list with Chakra). Small files and components; single responsibility; declarative; arrow-function components; Zod; React Query; centralized request/error handling; presentational components receive only props.
+- **NestJS**: One folder per feature (module, controller, service, DTOs); no horizontal `controllers/` or `services/` folders; controller = HTTP only, service = business logic.
+
+Do not implement behavior outside `openspec/changes/<change>/` specs; do not add horizontal layers that mix features.
