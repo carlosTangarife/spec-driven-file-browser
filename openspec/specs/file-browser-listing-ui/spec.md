@@ -54,7 +54,7 @@ The web application SHALL show loading and error feedback for listing requests (
 
 ### Requirement: Presentational listing and tests
 
-Listing rows SHALL be implemented as presentational components that receive data via props. New or changed hooks and services for this feature SHALL have **Vitest** unit tests using the **AAA** pattern; `npm test` for the web project SHALL pass before the change is considered implemented.
+Listing rows SHALL be implemented as presentational components that receive data via props. New or changed hooks and services for this feature SHALL have **Vitest** unit tests using the **AAA** pattern; `pnpm test` for the web project SHALL pass before the change is considered implemented.
 
 #### Scenario: Tests cover debounce or submit behavior
 
@@ -127,7 +127,7 @@ When the user **selects a file** node in the tree (or equivalent control), the a
 
 ### Requirement: Tests for new hooks and services
 
-New or changed hooks and services for **tree** and **file preview** SHALL include **Vitest** unit tests using **AAA** where logic is non-trivial (query keys, path handling, error mapping), and `npm test` for the web project SHALL pass before the change is considered complete.
+New or changed hooks and services for **tree** and **file preview** SHALL include **Vitest** unit tests using **AAA** where logic is non-trivial (query keys, path handling, error mapping), and `pnpm test` for the web project SHALL pass before the change is considered complete.
 
 #### Scenario: Tree hook or service has tests
 

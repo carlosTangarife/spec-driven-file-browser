@@ -69,8 +69,8 @@ Normative workflow context: **AGENTS.md** § Workflow.
 
    From the **repository root**, require **green** **lint** (for touched apps) and **unit tests** before any OpenSpec move or Git close-out:
 
-   - **Preferred:** **`npm run verify`** — runs **`npm run lint`** then **`npm test`** (ESLint on **`apps/web/src`** and **`apps/api/src`**, then Vitest for **api** and **web**).
-   - **Split:** **`npm run lint`** and **`npm test`** (or **`npx nx test api`** and **`npx nx test web`**) — **all** must exit **0**.
+   - **Preferred:** **`pnpm run verify`** — runs **`pnpm run lint`** then **`pnpm test`** (ESLint on **`apps/web/src`** and **`apps/api/src`**, then Vitest for **api** and **web**).
+   - **Split:** **`pnpm run lint`** and **`pnpm test`** (or **`pnpm exec nx test api`** and **`pnpm exec nx test web`**) — **all** must exit **0**.
 
    **If any fails:** **STOP** immediately. Do **not** run step **6** (Perform the archive) or step **8** (Git close-out). Report failing output; the user fixes and re-runs **`/opsx:archive`**.
 

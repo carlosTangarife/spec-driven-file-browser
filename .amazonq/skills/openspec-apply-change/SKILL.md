@@ -31,7 +31,7 @@ Implement tasks from an OpenSpec change.
    - If the current branch is already **`feature/<name>`** for this exact `<name>`, skip and state that.
    - Otherwise, from the **OpenSpec workspace root** (the directory that contains `openspec/` and, in this repo, `package.json` with script `git:feature`), run:
      ```bash
-     npm run git:feature -- <name>
+     pnpm run git:feature -- <name>
      ```
      This creates or checks out `feature/<name>` from the integration branch (**`trunk`**, else **`main`**, else **`master`**) per **AGENTS.md** and `scripts/git-feature-from-trunk.mjs`.
    - If the script is unavailable, replicate its behavior with git (checkout integration branch, pull, `git checkout -b feature/<name>` or checkout existing).

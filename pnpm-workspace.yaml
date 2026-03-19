@@ -1,0 +1,4 @@
+# Nx workspace packages — single root lockfile (pnpm-lock.yaml)
+packages:
+  - 'apps/*'
+  - 'libs/*'

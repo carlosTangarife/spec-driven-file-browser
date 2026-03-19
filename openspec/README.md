@@ -2,7 +2,7 @@
 
 OpenSpec changes live under `openspec/changes/` (active) and `openspec/changes/archive/` (completed). Canonical specs synced from archived changes live under `openspec/specs/<capability>/spec.md`.
 
-**Git:** **`feature/<change-name>`** from the integration branch (**`trunk`** — see **AGENTS.md**). **`/opsx:propose`** creates it before `openspec new change`; **`npm run git:feature`** can infer `<change-name>` when one active change exists (`openspec list`). Implement: **`/opsx:apply`** (also ensures the branch); finish (archive + commit + merge): **`/opsx:archive`** — **AGENTS.md** § Workflow, **`.cursor/commands/opsx-propose.md`**, **`.cursor/commands/opsx-apply.md`**, **`.cursor/commands/opsx-archive.md`**.
+**Git:** **`feature/<change-name>`** from the integration branch (**`trunk`** — see **AGENTS.md**). **`/opsx:propose`** creates it before `openspec new change`; **`pnpm run git:feature`** can infer `<change-name>` when one active change exists (`openspec list`). Implement: **`/opsx:apply`** (also ensures the branch); finish (archive + commit + merge): **`/opsx:archive`** — **AGENTS.md** § Workflow, **`.cursor/commands/opsx-propose.md`**, **`.cursor/commands/opsx-apply.md`**, **`.cursor/commands/opsx-archive.md`**.
 
 ## Link to coding style
 

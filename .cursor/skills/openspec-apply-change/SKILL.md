@@ -33,7 +33,7 @@ Implement tasks from an OpenSpec change.
    - If the current branch is already **`feature/<name>`** for this exact `<name>`, skip and state that.
    - Otherwise, from the **OpenSpec workspace root** (the directory that contains `openspec/` and, in this repo, `package.json` with script `git:feature`), run:
      ```bash
-     npm run git:feature -- <name>
+     pnpm run git:feature -- <name>
      ```
      This creates or checks out `feature/<name>` from the integration branch (**`trunk`**, else **`main`**, else **`master`**) per **AGENTS.md** and `scripts/git-feature-from-trunk.mjs`.
    - If the script is unavailable, replicate its behavior with git (checkout integration branch, pull, `git checkout -b feature/<name>` or checkout existing).
@@ -100,7 +100,7 @@ Implement tasks from an OpenSpec change.
 8. **Run unit tests (mandatory — see AGENTS.md)**
 
    After implementation work for this session (and **before** declaring apply complete or suggesting archive):
-   - Run **`npm test`** (runs `nx run-many -t test --projects=api,web`) or run **`nx test api`** and **`nx test web`** when only one app changed.
+   - Run **`pnpm test`** (runs `nx run-many -t test --projects=api,web`) or run **`nx test api`** and **`nx test web`** when only one app changed.
    - Tests MUST use **Vitest** and the **AAA** pattern (Arrange, Act, Assert) for new or changed behavior in `apps/api` and `apps/web`.
    - If any test fails: **fix code or tests and re-run** until green. **Do not** skip, `.skip`, or disable tests; **do not** use `passWithNoTests: true` to bypass empty suites for apps that must cover the feature.
    - **Apply is not complete** while `api:test` or `web:test` fails for projects in scope of the change.
@@ -110,7 +110,7 @@ Implement tasks from an OpenSpec change.
    Display:
    - Tasks completed this session
    - Overall progress: "N/M tasks complete"
-   - **Unit tests:** pass/fail summary (`npm test` output)
+   - **Unit tests:** pass/fail summary (`pnpm test` output)
    - If all tasks done **and tests green**: suggest archive
    - If tests red: report failures and iterate — do not suggest archive
    - If paused: explain why and wait for guidance
@@ -143,7 +143,7 @@ Working on task 4/7: <task description>
 - [x] Task 2
 ...
 
-All tasks complete and unit tests passed (`npm test`). Next: **`/opsx:archive`** — **AGENTS.md** § Workflow.
+All tasks complete and unit tests passed (`pnpm test`). Next: **`/opsx:archive`** — **AGENTS.md** § Workflow.
 ```
 
 **Output On Pause (Issue Encountered)**
@@ -168,7 +168,7 @@ What would you like to do?
 
 **Guardrails**
 - **Always run step 2** (feature branch) after the change is known — the branch name is the OpenSpec **change id**, not text extracted from `proposal.md`.
-- Never declare implementation complete or suggest archive until **`npm test`** (or scoped `nx test`) passes for affected apps
+- Never declare implementation complete or suggest archive until **`pnpm test`** (or scoped `nx test`) passes for affected apps
 - Keep going through tasks until done or blocked
 - Always read context files before starting (from the apply instructions output)
 - If task is ambiguous, pause and ask before implementing

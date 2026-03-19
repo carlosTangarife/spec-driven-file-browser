@@ -5,7 +5,7 @@ category: Workflow
 description: Implement tasks from an OpenSpec change — ensure feature branch + tasks (Experimental)
 ---
 
-Implement tasks from an OpenSpec change. **`/opsx:propose`** normally **already** created **`feature/<change-name>`**; this command **ensures** you are on that branch (idempotent — same `npm run git:feature` step). Finish workflow (archive + commit + merge): **`/opsx:archive`**.
+Implement tasks from an OpenSpec change. **`/opsx:propose`** normally **already** created **`feature/<change-name>`**; this command **ensures** you are on that branch (idempotent — same `pnpm run git:feature` step). Finish workflow (archive + commit + merge): **`/opsx:archive`**.
 
 **Input**: Optionally specify a change name (e.g., `/opsx:apply add-auth`). If omitted, check if it can be inferred from conversation context. If vague or ambiguous you MUST prompt for available changes.
 
@@ -22,17 +22,17 @@ Work happens on **`feature/<change-name>`**, not on the integration branch. The 
 1. `git rev-parse --is-inside-work-tree` — fail if not a repo.
 2. After the change name is known (step **Select the change** below):
    - If already on **`feature/<name>`** for this change, skip branch creation.
-   - Else from the **repository root** (directory with `openspec/`), run **`npm run git:feature -- <name>`** (same `<name>` as step 1; the script also supports **no** args when exactly one active change exists, but apply always has an explicit name after selection).
+   - Else from the **repository root** (directory with `openspec/`), run **`pnpm run git:feature -- <name>`** (same `<name>` as step 1; the script also supports **no** args when exactly one active change exists, but apply always has an explicit name after selection).
 3. **Integration branch** resolution for the script is **`trunk`** → **`main`** → **`master`** (see **`scripts/git-feature-from-trunk.mjs`**).
 4. On failure (e.g. dirty working tree), **stop** and report — do not implement on **`trunk`** / **`main`** / **`master`**.
-5. If **`npm`** is unavailable, replicate **`scripts/git-feature-from-trunk.mjs`** behavior.
+5. If **`pnpm`** is unavailable, replicate **`scripts/git-feature-from-trunk.mjs`** behavior.
 6. Announce: **Branch ready: `feature/<name>`** (or **Already on `feature/<name>`**).
 
-**If you skipped propose’s branch step:** Run **`npm run git:feature -- <name>`** (or **`npm run git:feature`** when exactly one active change) **before** continuing from **Check status** onward; same rules as above. See also **`.cursor/commands/opsx-propose.md`** § Git — feature branch.
+**If you skipped propose’s branch step:** Run **`pnpm run git:feature -- <name>`** (or **`pnpm run git:feature`** when exactly one active change) **before** continuing from **Check status** onward; same rules as above. See also **`.cursor/commands/opsx-propose.md`** § Git — feature branch.
 
 **When done:** **`/opsx:archive`** (archives OpenSpec and runs commit + merge to integration branch in the same session by default). Details: **AGENTS.md** § Workflow.
 
-**Code quality (mandatory):** When implementing tasks, follow **AGENTS.md** § *Code quality (mandatory)* — one primary unit per file, explicit return types on exports, thin components/controllers, SOLID, low cyclomatic complexity (`apps/web` and `apps/api`). Before considering work complete, run **`npm run lint`** (and **`npm test`**) for touched apps; **`npm run verify`** runs both in sequence.
+**Code quality (mandatory):** When implementing tasks, follow **AGENTS.md** § *Code quality (mandatory)* — one primary unit per file, explicit return types on exports, thin components/controllers, SOLID, low cyclomatic complexity (`apps/web` and `apps/api`). Before considering work complete, run **`pnpm run lint`** (and **`pnpm test`**) for touched apps; **`pnpm run verify`** runs both in sequence.
 
 ---
 

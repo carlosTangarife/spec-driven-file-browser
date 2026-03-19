@@ -8,8 +8,8 @@
  *     → infers `<kebab-name>` from the **single** active OpenSpec change (`openspec list --json`).
  *   node scripts/git-feature-from-trunk.mjs <kebab-case-change-name>
  *     → uses that name explicitly.
- *   npm run git:feature
- *   npm run git:feature -- my-change-name
+ *   pnpm run git:feature
+ *   pnpm run git:feature -- my-change-name
  */
 
 import { execSync } from 'node:child_process';
@@ -93,7 +93,7 @@ function resolveChangeName(explicit, openSpecProjectRoot) {
   } catch {
     console.error(
       '[git-feature] Could not run `openspec list --json`. Install the OpenSpec CLI and run from the repo root,\n' +
-        '  or pass the change name explicitly: npm run git:feature -- <kebab-case-change-name>'
+        '  or pass the change name explicitly: pnpm run git:feature -- <kebab-case-change-name>'
     );
     process.exit(1);
   }
@@ -110,7 +110,7 @@ function resolveChangeName(explicit, openSpecProjectRoot) {
   if (changes.length === 0) {
     console.error(
       '[git-feature] No active OpenSpec changes. Create a change under openspec/changes/ or pass a name:\n' +
-        '  npm run git:feature -- <kebab-case-change-name>'
+        '  pnpm run git:feature -- <kebab-case-change-name>'
     );
     process.exit(1);
   }
@@ -118,7 +118,7 @@ function resolveChangeName(explicit, openSpecProjectRoot) {
     const names = changes.map((c) => c.name).join(', ');
     console.error(
       `[git-feature] Multiple active OpenSpec changes (${names}). Pass the one to use:\n` +
-        '  npm run git:feature -- <kebab-case-change-name>'
+        '  pnpm run git:feature -- <kebab-case-change-name>'
     );
     process.exit(1);
   }
@@ -147,7 +147,7 @@ if (!openSpecRoot) {
   console.error(
     '[git-feature] Could not find an OpenSpec workspace (folder with `openspec/`). Run from that directory,\n' +
       '  or pass the branch suffix explicitly:\n' +
-      '  npm run git:feature -- <kebab-case-change-name>'
+      '  pnpm run git:feature -- <kebab-case-change-name>'
   );
   process.exit(1);
 }

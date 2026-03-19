@@ -8,24 +8,24 @@ This document is the **single source of truth** for business context, **workflow
 
 1. **Proposal** — Create or refine the change with OpenSpec: `proposal` → `design` → `specs` → `tasks` (e.g. `/opsx:propose` or openspec-propose skill).
    - **Trunk-based**: Work happens on **`feature/<change-name>`**, not on trunk. The **change name** is the OpenSpec change **id** (folder under `openspec/changes/<change-name>/` where **`proposal.md`** lives — use that id, not the proposal title).
-   - **Automatic branch (recommended path)**: **`/opsx:propose`** **creates or checks out** `feature/<change-name>` via **`npm run git:feature -- <change-name>`** (see **`.cursor/commands/opsx-propose.md`**) **before** `openspec new change`, once the change id is known.
+   - **Automatic branch (recommended path)**: **`/opsx:propose`** **creates or checks out** `feature/<change-name>` via **`pnpm run git:feature -- <change-name>`** (see **`.cursor/commands/opsx-propose.md`**) **before** `openspec new change`, once the change id is known.
 2. **Apply** — When starting implementation (`/opsx:apply` or openspec-apply-change):
    - **`/opsx:apply`** **ensures** the same `feature/<change-name>` (idempotent; see **`.cursor/commands/opsx-apply.md`**) right after the change is selected — covers legacy flows or manual OpenSpec without propose.
-   - **Without either command’s branch step**: Run **`npm run git:feature`** / **`npm run git:feature -- <change-name>`** first (infer name when exactly one active change exists), then continue; or run **`/opsx:apply`** from **Check status** onward if appropriate.
+   - **Without either command’s branch step**: Run **`pnpm run git:feature`** / **`pnpm run git:feature -- <change-name>`** first (infer name when exactly one active change exists), then continue; or run **`/opsx:apply`** from **Check status** onward if appropriate.
 3. **Work** — Implement tasks from `tasks.md` on that feature branch; keep commits focused.
-4. **Unit tests (mandatory)** — After each feature slice (and before considering **apply** or **archive** complete), add or update **unit tests** for both **`apps/api`** and **`apps/web`** that touch the change. Use the **AAA** pattern (Arrange, Act, Assert) in every test. Stack: **Vitest** (same runner for API Node tests and web). Run `npm test` (or `nx test api` and `nx test web`). **Do not skip, ignore, or disable tests** to “pass” the build; if tests fail, **iterate until green**. A change is **not** done while `api:test` or `web:test` fails. No `passWithNoTests: true` workaround for projects that must have coverage for the feature.
-5. **Lint (mandatory)** — For changes under **`apps/web`** or **`apps/api`**, run **`npm run lint`** (ESLint + TypeScript) and fix violations (e.g. implicit `any`, **react-hooks** rules) before treating work as complete. **`npm run verify`** runs **lint then** **`npm test`** in one step; use it before **archive** when those apps are touched.
-6. **Archive and land on trunk** — When the change is done **and verification is green** (**`npm run lint`** for touched apps, then **`npm test`**, as in **§ Lint** above):
+4. **Unit tests (mandatory)** — After each feature slice (and before considering **apply** or **archive** complete), add or update **unit tests** for both **`apps/api`** and **`apps/web`** that touch the change. Use the **AAA** pattern (Arrange, Act, Assert) in every test. Stack: **Vitest** (same runner for API Node tests and web). Run `pnpm test` (or `nx test api` and `nx test web`). **Do not skip, ignore, or disable tests** to “pass” the build; if tests fail, **iterate until green**. A change is **not** done while `api:test` or `web:test` fails. No `passWithNoTests: true` workaround for projects that must have coverage for the feature.
+5. **Lint (mandatory)** — For changes under **`apps/web`** or **`apps/api`**, run **`pnpm run lint`** (ESLint + TypeScript) and fix violations (e.g. implicit `any`, **react-hooks** rules) before treating work as complete. **`pnpm run verify`** runs **lint then** **`pnpm test`** in one step; use it before **archive** when those apps are touched.
+6. **Archive and land on trunk** — When the change is done **and verification is green** (**`pnpm run lint`** for touched apps, then **`pnpm test`**, as in **§ Lint** above):
    - Run **`/opsx:archive`** (or **openspec-archive-change**). Moves `openspec/changes/<change-name>/` → `openspec/changes/archive/YYYY-MM-DD-<change-name>/` (and syncs delta specs when applicable).
    - **Immediately after**, in the same session, **`/opsx:archive`** includes **Git close-out**: **conventional commit** on **`feature/<change-name>`**, **merge into the integration branch** (default **`trunk`**), **checkout** that branch — see **`.cursor/commands/opsx-archive.md`** step **8**. Archive **cannot** proceed without **tests and lint** passing per that command. Opt out of Git only if the user explicitly wants OpenSpec archive **without** Git.
-7. **Next change** — From the integration branch (**`trunk`** by default), start the next cycle with **`/opsx:propose`** (which creates **`feature/<next-change-name>`**) or run **`npm run git:feature -- <next-change-name>`** / **`npm run git:feature`** when appropriate, then **`/opsx:apply`** as usual.
+7. **Next change** — From the integration branch (**`trunk`** by default), start the next cycle with **`/opsx:propose`** (which creates **`feature/<next-change-name>`**) or run **`pnpm run git:feature -- <next-change-name>`** / **`pnpm run git:feature`** when appropriate, then **`/opsx:apply`** as usual.
 
 ### Cursor command cheat sheet (Git + OpenSpec)
 
 | Goal | Command |
 |------|---------|
-| Proposal + feature branch + artifacts | **`/opsx:propose`** (or: manual **`npm run git:feature -- <name>`** then OpenSpec CLI) |
-| Implement tasks (ensures feature branch) | **`/opsx:apply`**. If you skipped propose’s Git step: **`npm run git:feature`** / **`npm run git:feature -- <name>`** first |
+| Proposal + feature branch + artifacts | **`/opsx:propose`** (or: manual **`pnpm run git:feature -- <name>`** then OpenSpec CLI) |
+| Implement tasks (ensures feature branch) | **`/opsx:apply`**. If you skipped propose’s Git step: **`pnpm run git:feature`** / **`pnpm run git:feature -- <name>`** first |
 | Archive OpenSpec + commit + merge + integration branch | **`/opsx:archive`** (tests **`api`+`web`** then archive + Git close-out — **`.cursor/commands/opsx-archive.md`**) |
 
 ## Business objective
@@ -47,11 +47,11 @@ The product is a **file browser**: the API is the source of truth for the listin
 
 | Layer      | Technology | Notes |
 |-----------|------------|--------|
-| Monorepo  | **Nx**     | Apps and (future) libs; cache and task orchestration. |
+| Monorepo  | **Nx** + **pnpm** | Single root **`pnpm-lock.yaml`**; use **`pnpm`** for installs and scripts (see **`package.json`** `packageManager`). |
 | API       | **NestJS 11** | REST API; feature-based modules; SOLID, Screaming Architecture. |
 | Frontend  | **React 18**  | Vite; **Chakra UI** for components and layout; **React Query** for server state; **Zod** for validation; presentational UI. |
 | Language  | **TypeScript** | Strict; shared via `tsconfig.base.json`. |
-| Unit tests | **Vitest** | AAA pattern; `apps/api` (node) and `apps/web` (jsdom); `npm test` gates apply/archive. |
+| Unit tests | **Vitest** | AAA pattern; `apps/api` (node) and `apps/web` (jsdom); `pnpm test` gates apply/archive. |
 
 ## Architecture principles
 
@@ -175,7 +175,7 @@ This ties **openspec** to **how** we code, not only **what** we ship. **`design.
 
 ## Commands
 
-- `npm run serve:api` / `npx nx serve api` – API (default: http://localhost:3000/api).
-- `npm run serve:web` / `npx nx serve web` – Web app (default: http://localhost:4200).
+- `pnpm run serve:api` / `pnpm exec nx serve api` – API (default: http://localhost:3000/api).
+- `pnpm run serve:web` / `pnpm exec nx serve web` – Web app (default: http://localhost:4200).
 
 When implementing features or running OpenSpec apply/archive, follow the **Workflow** and **Vertical slices** rules in this document. Use `openspec/changes/<change>/` as the contract; do not add behavior outside specs.

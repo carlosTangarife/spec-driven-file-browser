@@ -20,4 +20,4 @@ Refactoring file locations and import paths SHALL **not** change user-visible be
 #### Scenario: Tests after restructure
 
 - **WHEN** the restructure is complete
-- **THEN** existing Vitest tests for the file browser slice pass without weakening assertions, and `npm test` (or `nx test web`) succeeds
+- **THEN** existing Vitest tests for the file browser slice pass without weakening assertions, and `pnpm test` (or `nx test web`) succeeds

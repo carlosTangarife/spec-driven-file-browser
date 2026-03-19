@@ -11,7 +11,7 @@ metadata:
 
 Propose a new change - create the change and generate all artifacts in one step.
 
-After the change **`<name>`** is known, **before** `openspec new change`, create or switch to **`feature/<name>`** via **`npm run git:feature -- <name>`** from the repo root (same rules as **`.cursor/commands/opsx-propose.md`** and **`scripts/git-feature-from-trunk.mjs`**). **`/opsx:apply`** repeats this ensure step.
+After the change **`<name>`** is known, **before** `openspec new change`, create or switch to **`feature/<name>`** via **`pnpm run git:feature -- <name>`** from the repo root (same rules as **`.cursor/commands/opsx-propose.md`** and **`scripts/git-feature-from-trunk.mjs`**). **`/opsx:apply`** repeats this ensure step.
 
 I'll create a change with artifacts:
 - proposal.md (what & why)
@@ -43,7 +43,7 @@ When ready to implement, run /opsx:apply
 
 2. **Create or switch to `feature/<name>`**
 
-   From the OpenSpec workspace root: **`npm run git:feature -- <name>`** (or replicate `scripts/git-feature-from-trunk.mjs` if npm is unavailable). If already on **`feature/<name>`**, skip. On failure (e.g. dirty tree), stop and report.
+   From the OpenSpec workspace root: **`pnpm run git:feature -- <name>`** (or replicate `scripts/git-feature-from-trunk.mjs` if pnpm is unavailable). If already on **`feature/<name>`**, skip. On failure (e.g. dirty tree), stop and report.
 
 3. **Create the change directory**
    ```bash

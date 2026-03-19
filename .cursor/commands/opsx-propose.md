@@ -27,13 +27,13 @@ Work for this change happens on **`feature/<change-name>`**, not on the integrat
 1. `git rev-parse --is-inside-work-tree` — fail if not a repo.
 2. After the change **`<name>`** is known (step **If no input provided…** below), **before** `openspec new change`:
    - If already on **`feature/<name>`** for this change, skip branch creation.
-   - Else from the **repository root** (directory with `openspec/`), run **`npm run git:feature -- <name>`**.
+   - Else from the **repository root** (directory with `openspec/`), run **`pnpm run git:feature -- <name>`**.
 3. **Integration branch** resolution for the script is **`trunk`** → **`main`** → **`master`** (see **`scripts/git-feature-from-trunk.mjs`**).
 4. On failure (e.g. dirty working tree), **stop** and report — do not create the change on **`trunk`** / **`main`** / **`master`**.
-5. If **`npm`** is unavailable, replicate **`scripts/git-feature-from-trunk.mjs`** behavior.
+5. If **`pnpm`** is unavailable, replicate **`scripts/git-feature-from-trunk.mjs`** behavior.
 6. Announce: **Branch ready: `feature/<name>`**.
 
-**Without this step:** If artifacts were created manually on the wrong branch, run **`npm run git:feature -- <name>`** (or move work as appropriate) before continuing; **`/opsx:apply`** also **ensures** the feature branch if you skipped propose’s Git step.
+**Without this step:** If artifacts were created manually on the wrong branch, run **`pnpm run git:feature -- <name>`** (or move work as appropriate) before continuing; **`/opsx:apply`** also **ensures** the feature branch if you skipped propose’s Git step.
 
 ---
 

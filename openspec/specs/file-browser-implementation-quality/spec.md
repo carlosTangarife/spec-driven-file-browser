@@ -29,5 +29,5 @@ The NestJS code under `apps/api/src/app/path-file-listing/` SHALL avoid duplicat
 
 #### Scenario: Tests remain green
 
-- **WHEN** `npm test` runs for `api` and `web`
+- **WHEN** `pnpm test` runs for `api` and `web`
 - **THEN** all tests pass with no change to externally observable API behavior described in existing functional specs

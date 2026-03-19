@@ -6,16 +6,16 @@ Canonical spec (synced from change `file-browser-devx-quality-docs`).
 
 ### Requirement: ESLint is a mandatory gate alongside unit tests
 
-The repository SHALL provide a documented **lint** command (`npm run lint` over `apps/web/src` and `apps/api/src`, or equivalent) that runs **ESLint** with TypeScript-aware rules. Implementers and the **apply / archive** workflow SHALL treat **lint success** as mandatory in the same sense as **`npm test`** for changes that touch those projects: **AGENTS.md** and **opsx-apply / opsx-archive** instructions SHALL reference **`npm run lint`** or **`npm run verify`** (lint + test) before considering work complete.
+The repository SHALL provide a documented **lint** command (`pnpm run lint` over `apps/web/src` and `apps/api/src`, or equivalent) that runs **ESLint** with TypeScript-aware rules. Implementers and the **apply / archive** workflow SHALL treat **lint success** as mandatory in the same sense as **`pnpm test`** for changes that touch those projects: **AGENTS.md** and **opsx-apply / opsx-archive** instructions SHALL reference **`pnpm run lint`** or **`pnpm run verify`** (lint + test) before considering work complete.
 
 #### Scenario: Lint catches unsafe typing in file-browser UI
 
 - **WHEN** a file under `apps/web/src/app/file-browser/ui/` uses implicit `any` or violates agreed ESLint rules
-- **THEN** `npm run lint` fails until fixed
+- **THEN** `pnpm run lint` fails until fixed
 
 #### Scenario: Documented verification command
 
-- **WHEN** a developer runs **`npm run verify`** from the repo root
+- **WHEN** a developer runs **`pnpm run verify`** from the repo root
 - **THEN** **lint** and **unit tests** for api and web execute in sequence
 
 ### Requirement: API exposes documented OpenAPI/Swagger for listing and preview

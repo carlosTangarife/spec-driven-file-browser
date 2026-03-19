@@ -52,7 +52,7 @@ Archive a completed change in the experimental workflow.
 
 3.5. **Run unit tests — `api` and `web` (mandatory — block archive if red)**
 
-   Same as **`.cursor/commands/opsx-archive.md`** step **5**: run **`npm test`** (both **api** and **web**) or **`nx test api`** and **`nx test web`** — **both** must pass.
+   Same as **`.cursor/commands/opsx-archive.md`** step **5**: run **`pnpm test`** (both **api** and **web**) or **`nx test api`** and **`nx test web`** — **both** must pass.
    - If **any test fails**: **STOP**. Do **not** move the change directory. Report failures; user fixes and re-runs archive.
    - Vitest, AAA, no faking green. See **AGENTS.md**.
 
@@ -117,7 +117,7 @@ Git: conventional commit + merge to integration branch + checkout completed (`/o
 ```
 
 **Guardrails**
-- **Block archive** if `npm test` fails; do not proceed to move the change directory
+- **Block archive** if `pnpm test` fails; do not proceed to move the change directory
 - After archive, run **opsx-archive step 8** unless the user opts out (**AGENTS.md** § Workflow)
 - Always prompt for change selection if not provided
 - Use artifact graph (openspec status --json) for completion checking
