@@ -1,16 +1,18 @@
 import { describe, it, expect } from 'vitest';
 import {
   filterEntriesByNamePrefix,
+  filterTreeNodesByNestedPrefix,
+  parseNestedPathForTreeFallback,
   splitPathInput,
   PATH_INPUT_MAX_LENGTH,
 } from './path-input.utils';
 import type { ListEntry } from './list-entry.types';
 
 describe('splitPathInput', () => {
-  it('treats input without slash as root listing and full string as name prefix', () => {
+  it('treats single segment without slash as wire path to that directory under root', () => {
     expect(splitPathInput('  app  ')).toEqual({
-      listingWirePath: '',
-      namePrefix: 'app',
+      listingWirePath: 'app',
+      namePrefix: '',
     });
   });
 
@@ -30,8 +32,8 @@ describe('splitPathInput', () => {
 
   it('caps length at PATH_INPUT_MAX_LENGTH', () => {
     const long = `${'a'.repeat(PATH_INPUT_MAX_LENGTH)}extra`;
-    const { namePrefix } = splitPathInput(long);
-    expect(namePrefix.length).toBeLessThanOrEqual(PATH_INPUT_MAX_LENGTH);
+    const { listingWirePath } = splitPathInput(long);
+    expect(listingWirePath.length).toBeLessThanOrEqual(PATH_INPUT_MAX_LENGTH);
   });
 });
 
@@ -52,5 +54,34 @@ describe('filterEntriesByNamePrefix', () => {
     expect(result.map((e) => e.name).sort()).toEqual(
       ['AppService', 'applications', 'apps'].sort(),
     );
+  });
+});
+
+describe('parseNestedPathForTreeFallback', () => {
+  it('returns parent and last segment for nested path', () => {
+    expect(parseNestedPathForTreeFallback('apps/a')).toEqual({
+      parentPath: 'apps',
+      lastSegment: 'a',
+    });
+  });
+
+  it('returns null when no slash', () => {
+    expect(parseNestedPathForTreeFallback('apps')).toBeNull();
+  });
+
+  it('returns null for empty string', () => {
+    expect(parseNestedPathForTreeFallback('')).toBeNull();
+  });
+});
+
+describe('filterTreeNodesByNestedPrefix', () => {
+  const nodes = [
+    { name: 'apple', type: 'directory' as const, path: 'apps/apple', children: [] },
+    { name: 'zebra', type: 'file' as const, path: 'apps/zebra', children: [] },
+  ];
+
+  it('filters from length 1 case-insensitively', () => {
+    const out = filterTreeNodesByNestedPrefix(nodes, 'a');
+    expect(out.map((n) => n.name)).toEqual(['apple']);
   });
 });

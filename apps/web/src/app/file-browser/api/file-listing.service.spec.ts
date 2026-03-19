@@ -1,5 +1,9 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { fetchDirectoryTree, fetchFileListing } from './file-listing.service';
+import {
+  fetchDirectoryTree,
+  fetchDirectoryTreeWithFallback,
+  fetchFileListing,
+} from './file-listing.service';
 
 describe('fetchFileListing', () => {
   beforeEach(() => {
@@ -95,5 +99,51 @@ describe('fetchDirectoryTree', () => {
     const result = await fetchDirectoryTree('root', 2);
     expect(fetch).toHaveBeenCalledWith('/api/listing/tree?path=root&depth=2');
     expect(result).toEqual(payload);
+  });
+});
+
+describe('fetchDirectoryTreeWithFallback', () => {
+  beforeEach(() => {
+    vi.stubGlobal('fetch', vi.fn());
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it('on 404 for nested path fetches parent and filters by last segment', async () => {
+    const parentPayload = [
+      {
+        name: 'apple',
+        type: 'directory' as const,
+        path: 'apps/apple',
+        children: [],
+      },
+      {
+        name: 'zebra',
+        type: 'file' as const,
+        path: 'apps/zebra',
+        children: [],
+      },
+    ];
+
+    vi.mocked(fetch)
+      .mockResolvedValueOnce({ ok: false, status: 404 } as Response)
+      .mockResolvedValueOnce({
+        ok: true,
+        json: () => Promise.resolve(parentPayload),
+      } as unknown as Response);
+
+    const result = await fetchDirectoryTreeWithFallback('apps/a', 1);
+
+    expect(fetch).toHaveBeenNthCalledWith(
+      1,
+      '/api/listing/tree?path=apps%2Fa&depth=1',
+    );
+    expect(fetch).toHaveBeenNthCalledWith(
+      2,
+      '/api/listing/tree?path=apps&depth=1',
+    );
+    expect(result).toEqual([parentPayload[0]]);
   });
 });

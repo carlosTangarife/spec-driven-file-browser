@@ -23,7 +23,7 @@ describe('useListingPathState', () => {
     vi.useRealTimers();
   });
 
-  it('applies listing wire path immediately on Enter before debounce (root filter token)', () => {
+  it('applies listing wire path immediately on Enter before debounce (single segment)', () => {
     const wrapper = createWrapper();
     const { result } = renderHook(() => useListingPathState(), { wrapper });
 
@@ -44,7 +44,7 @@ describe('useListingPathState', () => {
       } as unknown as KeyboardEvent<HTMLInputElement>);
     });
 
-    expect(result.current.listingPath).toBe('');
+    expect(result.current.listingPath).toBe('skip-wait');
   });
 
   it('applies full nested wire path on Tab when input contains a slash without trailing slash', () => {

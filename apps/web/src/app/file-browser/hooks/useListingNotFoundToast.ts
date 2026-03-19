@@ -3,7 +3,8 @@ import { ListingRequestError } from '../api/file-listing.service';
 import { listingToaster } from '../api/listing-toaster';
 
 /**
- * Shows a friendly English toast when the listing API returns 404.
+ * Shows a friendly English toast when the tree/listing query ends with 404
+ * (after any client-side fallback such as parent + prefix).
  */
 export const useListingNotFoundToast = (
   error: unknown,

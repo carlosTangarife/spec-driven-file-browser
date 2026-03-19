@@ -6,8 +6,9 @@ import type { FC, ReactNode } from 'react';
  * Shared toaster for listing-related notifications (404, min-length hint).
  */
 export const listingToaster = createToaster({
-  placement: 'top-end',
+  placement: 'bottom',
   duration: 5000,
+  offsets: { bottom: '1rem' },
 });
 
 const RenderToaster = Toaster as FC<{
@@ -21,8 +22,8 @@ const RenderToaster = Toaster as FC<{
 export const ListingToaster = () => (
   <RenderToaster toaster={listingToaster}>
     {(toast: ToastOptions) => (
-      <ToastRoot key={toast.id}>
-        <Box>
+      <ToastRoot key={toast.id} maxW="min(100vw - 2rem, 28rem)" width="100%" mx="auto">
+        <Box px={1} py={0.5}>
           {toast.title != null ? (
             <Text fontWeight="semibold">{toast.title}</Text>
           ) : null}

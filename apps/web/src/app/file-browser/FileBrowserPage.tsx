@@ -151,8 +151,10 @@ export const FileBrowserPage = () => {
               <Text fontSize="xs" color="fg.muted">
                 Click a folder row to expand or collapse. Double-click to set
                 that folder as the current path (adds a trailing slash in the
-                field). Type nested paths without a final slash—the tree uses the
-                full path.
+                field).                 A single folder name (e.g. apps) works without a trailing slash.
+                Nested paths without a final slash open that folder when it
+                exists; otherwise matching children of the parent are shown (e.g.
+                typing apps/a finds apps/apple).
               </Text>
               {treeErrorMessage && (
                 <Text colorPalette="red" fontSize="sm" role="alert">

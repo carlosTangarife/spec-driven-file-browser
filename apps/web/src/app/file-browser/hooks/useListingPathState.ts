@@ -18,7 +18,7 @@ export type UseListingPathStateResult = {
 };
 
 /**
- * Debounces the **listing wire path** (parent of the typed segment), not the raw string.
+ * Debounces the **listing wire path** from `splitPathInput`, not the raw string.
  * Enter/Tab flushes the current derived wire path for the query.
  */
 export const useListingPathState = (): UseListingPathStateResult => {

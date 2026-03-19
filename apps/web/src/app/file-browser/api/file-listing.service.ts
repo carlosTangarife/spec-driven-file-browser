@@ -1,4 +1,8 @@
 import { z } from 'zod';
+import {
+  filterTreeNodesByNestedPrefix,
+  parseNestedPathForTreeFallback,
+} from '../lib/path-input.utils';
 import type { ListEntry } from '../lib/list-entry.types';
 
 /**
@@ -75,4 +79,24 @@ export const fetchDirectoryTree = (
     const json: unknown = await res.json();
     return directoryTreeSchema.parse(json);
   });
+};
+
+/**
+ * Loads tree for `primaryPath`; on **404**, if the path looks like `parent/lastSegment`,
+ * loads `parent` and filters immediate children by `lastSegment` (prefix, case-insensitive).
+ */
+export const fetchDirectoryTreeWithFallback = async (
+  primaryPath: string,
+  depth: number,
+): Promise<DirectoryTreeNode[]> => {
+  try {
+    return await fetchDirectoryTree(primaryPath, depth);
+  } catch (e) {
+    if (!(e instanceof ListingRequestError) || e.status !== 404) throw e;
+    const parsed = parseNestedPathForTreeFallback(primaryPath);
+    if (!parsed) throw e;
+    const { parentPath, lastSegment } = parsed;
+    const nodes = await fetchDirectoryTree(parentPath, depth);
+    return filterTreeNodesByNestedPrefix(nodes, lastSegment);
+  }
 };

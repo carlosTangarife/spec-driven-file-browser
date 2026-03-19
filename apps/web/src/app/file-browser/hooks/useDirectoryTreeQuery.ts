@@ -1,15 +1,16 @@
 import { useQuery } from '@tanstack/react-query';
-import { fetchDirectoryTree } from '../api/file-listing.service';
+import { fetchDirectoryTreeWithFallback } from '../api/file-listing.service';
 
 const DEFAULT_DEPTH = 1;
 
 /**
- * Loads directory tree for a wire path. Default **depth=1** (one level); expand folders in UI to load more.
+ * Loads directory tree for a wire path. On **404**, falls back to parent + prefix filter
+ * when the path contains `/` (see `fetchDirectoryTreeWithFallback`).
  */
 export const useDirectoryTreeQuery = (listingPath: string, depth = DEFAULT_DEPTH) =>
   useQuery({
     queryKey: ['directoryTree', listingPath, depth] as const,
-    queryFn: () => fetchDirectoryTree(listingPath, depth),
+    queryFn: () => fetchDirectoryTreeWithFallback(listingPath, depth),
     staleTime: 60_000,
     gcTime: 5 * 60_000,
   });
