@@ -41,6 +41,20 @@ The NestJS application SHALL expose an **OpenAPI** description and **Swagger UI*
 - **WHEN** the api e2e suite runs
 - **THEN** tests assert successful responses from listing, tree, and preview endpoints
 
+### Requirement: Archive runs e2e after lint and unit tests; e2e failure triggers structured apply re-review
+
+The **`/opsx:archive`** workflow (and equivalent **openspec-archive-change** skill) SHALL **not** move an OpenSpec change to **`openspec/changes/archive/`** or run Git close-out until **`pnpm exec nx e2e api-e2e`** and **`pnpm exec nx e2e web-e2e`** have been executed from the repository root and **both** exit **0**, in addition to lint and unit tests (**`pnpm run verify`** or equivalent). **WHEN** any e2e run fails, the agent SHALL **not** leave the workflow in an indeterminate state without first completing **at least three** structured **apply re-review** passes (re-read **`tasks.md`** and change specs, re-inspect diffs from **`/opsx:apply`**, record hypotheses and ruled-out causes); only then MAY the agent hand off with a determinate summary of what failed and what remains.
+
+#### Scenario: Archive blocked on red e2e
+
+- **WHEN** **`pnpm exec nx e2e web-e2e`** or **`pnpm exec nx e2e api-e2e`** exits non-zero during archive
+- **THEN** the OpenSpec directory is **not** archived and Git close-out does **not** run until e2e is green or the user explicitly opts out of e2e for that run
+
+#### Scenario: E2e failure requires three apply reviews before vague stop
+
+- **WHEN** e2e fails during archive
+- **THEN** the agent performs **at least three** documented passes comparing implementation to **`tasks.md`** and specs before ending with only a vague or inconclusive status
+
 ### Requirement: README is the project entrypoint with vision, OpenSpec, and screenshots
 
 The root **`README.md`** SHALL explain the **purpose** of the file browser, **why OpenSpec** is used, and include **images** for **desktop** and **mobile** plus a **preview** screenshot. It SHALL include a **hypothetical feature** example and **OpenSpec-related commands** to propose, verify, and archive.

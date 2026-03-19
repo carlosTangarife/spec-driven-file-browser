@@ -50,28 +50,19 @@ Archive a completed change in the experimental workflow.
 
    **If no tasks file exists:** Proceed without task-related warning.
 
-3.5. **Run unit tests — `api` and `web` (mandatory — block archive if red)**
-
-   Same as **`.cursor/commands/opsx-archive.md`** step **5**: run **`pnpm test`** (both **api** and **web**) or **`nx test api`** and **`nx test web`** — **both** must pass.
-   - If **any test fails**: **STOP**. Do **not** move the change directory. Report failures; user fixes and re-runs archive.
-   - Vitest, AAA, no faking green. See **AGENTS.md**.
-
 4. **Assess delta spec sync state**
 
-   Check for delta specs at `openspec/changes/<name>/specs/`. If none exist, proceed without sync prompt.
+   Same as **`.cursor/commands/opsx-archive.md`** step **4**. Check for delta specs at `openspec/changes/<name>/specs/`. Prompt sync vs archive-without-sync when applicable. Use openspec-sync-specs when the user chooses sync.
 
-   **If delta specs exist:**
-   - Compare each delta spec with its corresponding main spec at `openspec/specs/<capability>/spec.md`
-   - Determine what changes would be applied (adds, modifications, removals, renames)
-   - Show a combined summary before prompting
+5. **Run lint and unit tests — `api` and `web` (mandatory — block archive if red)**
 
-   **Prompt options:**
-   - If changes needed: "Sync now (recommended)", "Archive without syncing"
-   - If already synced: "Archive now", "Sync anyway", "Cancel"
+   Same as **opsx-archive** step **5**: **`pnpm run verify`** (or equivalent **`pnpm run lint`** + **`pnpm test`** / scoped **`nx test`**). If **any** fails: **STOP**; do not run e2e or archive. See **AGENTS.md**.
 
-   If user chooses sync, use Task tool (subagent_type: "general-purpose", prompt: "Use Skill tool to invoke openspec-sync-specs for change '<name>'. Delta spec analysis: <include the analyzed delta spec summary>"). Proceed to archive regardless of choice.
+6. **Run e2e — `api-e2e` and `web-e2e` (mandatory — block archive if red)**
 
-5. **Perform the archive** (only after step 3.5 tests passed)
+   Same as **opsx-archive** step **6**: from repo root, **`pnpm exec nx e2e api-e2e`** and **`pnpm exec nx e2e web-e2e`** — **both** exit **0**. If e2e fails: **do not** archive; follow **apply re-review protocol** (minimum **3** passes over tasks/specs/diff vs **`/opsx:apply`** output) before a determinate handoff — full rules in **opsx-archive** step **6**.
+
+7. **Perform the archive** (only after steps **5–6** are green)
 
    Create the archive directory if it doesn't exist:
    ```bash
@@ -88,18 +79,13 @@ Archive a completed change in the experimental workflow.
    mv openspec/changes/<name> openspec/changes/archive/YYYY-MM-DD-<name>
    ```
 
-6. **Git close-out (mandatory — same session)**
+8. **Display summary (OpenSpec only)**
 
-   After a successful archive, execute **Git close-out** per **`.cursor/commands/opsx-archive.md`** step **8** (same session unless the user opts out). **AGENTS.md** § Workflow.
+   Same as **opsx-archive** step **8**: change name, schema, archive path, spec sync status, warnings.
 
-7. **Display summary**
+9. **Git close-out (mandatory — same session)**
 
-   Show archive completion summary including:
-   - Change name
-   - Schema that was used
-   - Archive location
-   - Whether specs were synced (if applicable)
-   - Note about any warnings (incomplete artifacts/tasks)
+   After a successful archive, execute **Git close-out** per **`.cursor/commands/opsx-archive.md`** step **9** (same session unless the user opts out). **AGENTS.md** § Workflow.
 
 **Output On Success**
 
@@ -113,15 +99,16 @@ Archive a completed change in the experimental workflow.
 
 All artifacts complete. All tasks complete.
 
-Git: conventional commit + merge to integration branch + checkout completed (`/opsx:archive` step 8).
+Git: conventional commit + merge to integration branch + checkout completed (`/opsx:archive` step 9).
 ```
 
 **Guardrails**
-- **Block archive** if `pnpm test` fails; do not proceed to move the change directory
-- After archive, run **opsx-archive step 8** unless the user opts out (**AGENTS.md** § Workflow)
+- **Block archive** if **`pnpm run verify`** or **e2e** fails; do not move the change directory
+- On **e2e** failure, run at least **3** apply re-review passes before a non-vague stop (see **opsx-archive** step **6**)
+- After archive, run **opsx-archive step 9** unless the user opts out (**AGENTS.md** § Workflow)
 - Always prompt for change selection if not provided
 - Use artifact graph (openspec status --json) for completion checking
-- Don't block archive on other warnings (incomplete tasks with user confirm) except **failing unit tests** — those always block
+- Don't block archive on other warnings (incomplete tasks with user confirm) except **failing lint/unit/e2e** — those always block
 - Preserve .openspec.yaml when moving to archive (it moves with the directory)
 - Show clear summary of what happened
 - If sync is requested, use openspec-sync-specs approach (agent-driven)

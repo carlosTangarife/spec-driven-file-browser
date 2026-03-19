@@ -45,7 +45,7 @@ Features are developed as **OpenSpec changes** under `openspec/changes/<change-i
 | `pnpm run build:api` / `pnpm run build:web` | Production builds |
 | `pnpm run lint` | ESLint for `apps/web/src` and `apps/api/src` |
 | `pnpm test` | Vitest for **api** and **web** |
-| `pnpm run verify` | **`lint`** then **`pnpm test`** (recommended before merge/archive) |
+| `pnpm run verify` | **`lint`** then **`pnpm test`** (local gate; **`/opsx:archive`** also runs **both e2e** targets — see **AGENTS.md**) |
 | `pnpm exec nx e2e web-e2e` | Playwright (starts **api:serve**; Nx runs **web:preview** first) |
 | `pnpm exec nx e2e api-e2e` | Jest e2e against a running API (see Nx `dependsOn`) |
 | `pnpm run git:feature -- <change-id>` | Create/switch to `feature/<change-id>` from **`trunk`** |
@@ -83,8 +83,10 @@ Suppose you want a **download** action for the selected file (business-relevant,
 4. **Verify**
    ```bash
    pnpm run verify
+   pnpm exec nx e2e api-e2e
    pnpm exec nx e2e web-e2e
    ```
+   **`/opsx:archive`** runs **`pnpm run verify`** and **both** e2e commands before archiving (unless you explicitly opt out of e2e for that run).
 5. **Archive + Git** (on green): **`/opsx:archive`** — moves the change under `openspec/changes/archive/YYYY-MM-DD-file-browser-file-download/`, conventional commit, merge to **`trunk`**.
 
 Full workflow details: **`AGENTS.md`**.

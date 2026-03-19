@@ -168,7 +168,7 @@ What would you like to do?
 
 **Guardrails**
 - **Always run step 2** (feature branch) after the change is known — the branch name is the OpenSpec **change id**, not text extracted from `proposal.md`.
-- Never declare implementation complete or suggest archive until **`pnpm test`** (or scoped `nx test`) passes for affected apps
+- Never declare implementation complete or suggest **`/opsx:archive`** until **`pnpm test`** (or scoped `nx test`) passes for affected apps; **archive** also requires **e2e** green (**`pnpm exec nx e2e api-e2e`**, **`pnpm exec nx e2e web-e2e`**) per **`.cursor/commands/opsx-archive.md`**
 - Keep going through tasks until done or blocked
 - Always read context files before starting (from the apply instructions output)
 - If task is ambiguous, pause and ask before implementing

@@ -15,9 +15,9 @@ This document is the **single source of truth** for business context, **workflow
 3. **Work** — Implement tasks from `tasks.md` on that feature branch; keep commits focused.
 4. **Unit tests (mandatory)** — After each feature slice (and before considering **apply** or **archive** complete), add or update **unit tests** for both **`apps/api`** and **`apps/web`** that touch the change. Use the **AAA** pattern (Arrange, Act, Assert) in every test. Stack: **Vitest** (same runner for API Node tests and web). Run `pnpm test` (or `nx test api` and `nx test web`). **Do not skip, ignore, or disable tests** to “pass” the build; if tests fail, **iterate until green**. A change is **not** done while `api:test` or `web:test` fails. No `passWithNoTests: true` workaround for projects that must have coverage for the feature.
 5. **Lint (mandatory)** — For changes under **`apps/web`** or **`apps/api`**, run **`pnpm run lint`** (ESLint + TypeScript) and fix violations (e.g. implicit `any`, **react-hooks** rules) before treating work as complete. **`pnpm run verify`** runs **lint then** **`pnpm test`** in one step; use it before **archive** when those apps are touched.
-6. **Archive and land on trunk** — When the change is done **and verification is green** (**`pnpm run lint`** for touched apps, then **`pnpm test`**, as in **§ Lint** above):
+6. **Archive and land on trunk** — When the change is done **and verification is green** (**`pnpm run lint`**, **`pnpm test`**, then **e2e** — see **`.cursor/commands/opsx-archive.md`** steps **5–6**):
    - Run **`/opsx:archive`** (or **openspec-archive-change**). Moves `openspec/changes/<change-name>/` → `openspec/changes/archive/YYYY-MM-DD-<change-name>/` (and syncs delta specs when applicable).
-   - **Immediately after**, in the same session, **`/opsx:archive`** includes **Git close-out**: **conventional commit** on **`feature/<change-name>`**, **merge into the integration branch** (default **`trunk`**), **checkout** that branch — see **`.cursor/commands/opsx-archive.md`** step **8**. Archive **cannot** proceed without **tests and lint** passing per that command. Opt out of Git only if the user explicitly wants OpenSpec archive **without** Git.
+   - **Immediately after**, in the same session, **`/opsx:archive`** includes **Git close-out**: **conventional commit** on **`feature/<change-name>`**, **merge into the integration branch** (default **`trunk`**), **checkout** that branch — see **`.cursor/commands/opsx-archive.md`** step **9**. Archive **cannot** proceed without **lint, unit tests, and `api-e2e` + `web-e2e`** passing per that command. If **e2e** fails, agents MUST run the **apply re-review protocol** (minimum **three** structured passes over **`/opsx:apply`** work) before ending with a determinate blocked handoff — see **opsx-archive** step **6**. Opt out of Git only if the user explicitly wants OpenSpec archive **without** Git.
 7. **Next change** — From the integration branch (**`trunk`** by default), start the next cycle with **`/opsx:propose`** (which creates **`feature/<next-change-name>`**) or run **`pnpm run git:feature -- <next-change-name>`** / **`pnpm run git:feature`** when appropriate, then **`/opsx:apply`** as usual.
 
 ### Cursor command cheat sheet (Git + OpenSpec)
@@ -26,7 +26,7 @@ This document is the **single source of truth** for business context, **workflow
 |------|---------|
 | Proposal + feature branch + artifacts | **`/opsx:propose`** (or: manual **`pnpm run git:feature -- <name>`** then OpenSpec CLI) |
 | Implement tasks (ensures feature branch) | **`/opsx:apply`**. If you skipped propose’s Git step: **`pnpm run git:feature`** / **`pnpm run git:feature -- <name>`** first |
-| Archive OpenSpec + commit + merge + integration branch | **`/opsx:archive`** (tests **`api`+`web`** then archive + Git close-out — **`.cursor/commands/opsx-archive.md`**) |
+| Archive OpenSpec + commit + merge + integration branch | **`/opsx:archive`** (lint + **`api`/`web` unit tests + e2e**, then archive + Git close-out — **`.cursor/commands/opsx-archive.md`**) |
 
 ## Business objective
 
