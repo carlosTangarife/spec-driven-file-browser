@@ -1,5 +1,9 @@
-## ADDED Requirements
+# directory-tree-listing Specification
 
+## Purpose
+
+Define the HTTP contract for **nested directory tree** listing under the allowed root (wire path, depth, node shape, omission rules aligned with flat listing).
+## Requirements
 ### Requirement: Directory tree endpoint
 
 The API SHALL expose an HTTP operation that accepts a **relative wire path** (same segment and root rules as `path-file-listing`) identifying a **directory** anchor and a **depth** query parameter. The response SHALL represent a **tree**: each **directory** node includes a list of **child** nodes (files and subdirectories); **file** nodes SHALL NOT include nested directory children. The server SHALL recurse into subdirectories until the remaining depth reaches zero or there are no further subdirectories.
@@ -41,3 +45,22 @@ The tree implementation SHALL use Node.js **path** and **fs** APIs consistent wi
 
 - **WHEN** the server runs on Windows or on POSIX
 - **THEN** successful tree responses follow the same JSON shape and status codes for equivalent valid wire paths under the configured allowed root
+
+### Requirement: Shallow tree requests
+
+The client MAY request **depth** equal to **1** to obtain only **immediate** children of the anchor directory (no nested recursion below that level). The API SHALL honor **depth=1** the same way as larger depths: recursion stops when the remaining depth reaches zero.
+
+#### Scenario: Depth one returns only immediate children
+
+- **WHEN** the client requests a tree with **depth** set to **1** for a directory that contains nested subdirectories
+- **THEN** each directory node’s **children** array SHALL list only immediate entries at that level and SHALL NOT include nested **children** arrays for subdirectories beyond that single level
+
+### Requirement: Tree listings omit VCS metadata entries
+
+Tree **children** arrays SHALL apply the same **entry omission** rules as flat `path-file-listing` (see delta spec **`path-file-listing`** in this change).
+
+#### Scenario: Blacklisted directory names do not appear as tree nodes
+
+- **WHEN** a parent directory contains an omitted VCS/metadata subdirectory per **`path-file-listing`** omission rules
+- **THEN** that subdirectory SHALL NOT appear as a node in the tree response for requests scoped to that parent
+

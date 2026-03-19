@@ -6,7 +6,8 @@ import {
 } from '../lib/path-input.utils';
 import { useDebouncedValue } from './useDebouncedValue';
 
-const DEBOUNCE_MS = 300;
+/** Debounce before syncing listing/tree wire path (reduces API churn while typing). */
+const DEBOUNCE_MS = 500;
 
 export type UseListingPathStateResult = {
   pathInput: string;

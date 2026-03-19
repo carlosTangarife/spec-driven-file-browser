@@ -26,6 +26,13 @@ The app already exposes **flat** directory listing (`path-file-listing`) and a *
 | **`GET` + query params** for tree (`path`, `depth`) and preview (`path`) | Aligns with existing listing style; easy to cache with React Query keys. | POST bodies for reads — unnecessary. |
 | **Depth default `3`, min product depth `3`** | Matches request “at least three levels.” | Larger default — tune later via config. |
 | **Preview: UTF-8 text, max size cap** | Predictable memory and XSS surface; reject or flag binary. | Stream unlimited — rejected. |
+| **VCS/metadata directory blacklist** | Hides `.git`, `.github`, `.svn`, `.hg`, and directories whose name starts with `.git` from **immediate** listing/tree children; reduces noise and accidental heavy scans. | Hide all dotfiles — rejected (too broad). |
+| **Lazy tree UX: depth=1 + expand loads children** | UI requests shallow trees; chevron expand fetches that folder’s children; double-click (or equivalent) sets global path. Keeps payloads smaller than default depth **3** for full subtrees. | Always fetch depth **3** at root — rejected for large trees. |
+| **Path input perf: debounce + deferred value + staleTime** | Fewer tree queries while typing; smoother input. | Fire on every keystroke — rejected. |
+
+## Process note
+
+Product behavior added or changed during implementation for this proposal SHALL be reflected in **this change’s** `specs/**/*.md` and `design.md` so **`openspec/changes/<change-id>/`** remains the normative delta before archive merges into `openspec/specs/`.
 
 ## Risks / Trade-offs
 

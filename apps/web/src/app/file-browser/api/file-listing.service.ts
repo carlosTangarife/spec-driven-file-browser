@@ -39,3 +39,40 @@ export const fetchFileListing = (path?: string): Promise<ListEntry[]> => {
     return listEntriesSchema.parse(json);
   });
 };
+
+/** Nested directory tree node (matches API `TreeNodeDto`). */
+export type DirectoryTreeNode = {
+  name: string;
+  type: 'file' | 'directory';
+  path: string;
+  children: DirectoryTreeNode[];
+};
+
+export const directoryTreeNodeSchema: z.ZodType<DirectoryTreeNode> = z.lazy(() =>
+  z.object({
+    name: z.string(),
+    type: z.enum(['file', 'directory']),
+    path: z.string(),
+    children: z.array(directoryTreeNodeSchema),
+  }),
+);
+
+export const directoryTreeSchema = z.array(directoryTreeNodeSchema);
+
+/**
+ * Fetches nested directory tree from `GET /api/listing/tree`.
+ */
+export const fetchDirectoryTree = (
+  path: string | undefined,
+  depth = 3,
+): Promise<DirectoryTreeNode[]> => {
+  const params = new URLSearchParams();
+  if (path != null && path !== '') params.set('path', path);
+  params.set('depth', String(depth));
+  const url = `/api/listing/tree?${params.toString()}`;
+  return fetch(url).then(async (res) => {
+    if (!res.ok) throw new ListingRequestError(res.status);
+    const json: unknown = await res.json();
+    return directoryTreeSchema.parse(json);
+  });
+};

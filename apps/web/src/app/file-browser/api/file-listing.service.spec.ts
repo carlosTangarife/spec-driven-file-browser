@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { fetchFileListing } from './file-listing.service';
+import { fetchDirectoryTree, fetchFileListing } from './file-listing.service';
 
 describe('fetchFileListing', () => {
   beforeEach(() => {
@@ -52,5 +52,48 @@ describe('fetchFileListing', () => {
     await expect(fetchFileListing('missing')).rejects.toMatchObject({
       status: 404,
     });
+  });
+});
+
+describe('fetchDirectoryTree', () => {
+  beforeEach(() => {
+    vi.stubGlobal('fetch', vi.fn());
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it('calls /api/listing/tree with path and depth', async () => {
+    const mockJson = vi.fn().mockResolvedValue([]);
+    vi.mocked(fetch).mockResolvedValue({
+      ok: true,
+      json: mockJson,
+    } as unknown as Response);
+
+    await fetchDirectoryTree('foo', 3);
+
+    expect(fetch).toHaveBeenCalledWith('/api/listing/tree?path=foo&depth=3');
+  });
+
+  it('parses nested tree nodes', async () => {
+    const payload = [
+      {
+        name: 'a',
+        type: 'directory' as const,
+        path: 'a',
+        children: [
+          { name: 'b.txt', type: 'file' as const, path: 'a/b.txt', children: [] },
+        ],
+      },
+    ];
+    vi.mocked(fetch).mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve(payload),
+    } as unknown as Response);
+
+    const result = await fetchDirectoryTree('root', 2);
+    expect(fetch).toHaveBeenCalledWith('/api/listing/tree?path=root&depth=2');
+    expect(result).toEqual(payload);
   });
 });
