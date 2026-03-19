@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { fetchFileListing } from './file-listing.service';
+import { fetchFileListing } from '../api/file-listing.service';
 
 /**
  * Loads directory listing for a wire path (relative, `/` segments; empty string = root).

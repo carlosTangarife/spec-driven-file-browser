@@ -1,15 +1,13 @@
 import { Box, Container, Heading, Stack } from '@chakra-ui/react';
 import { useMemo } from 'react';
-import { FileListingView } from './FileListingView';
-import {
-  ListingRequestError,
-} from './file-listing.service';
-import { filterEntriesByNamePrefix } from './path-input.utils';
-import { PathInput } from './PathInput';
-import { useFileListingQuery } from './useFileListingQuery';
-import { useListingNotFoundToast } from './useListingNotFoundToast';
-import { useListingPathState } from './useListingPathState';
-import { useMinCharsHint } from './useMinCharsHint';
+import { ListingRequestError } from './api/file-listing.service';
+import { useFileListingQuery } from './hooks/useFileListingQuery';
+import { useListingNotFoundToast } from './hooks/useListingNotFoundToast';
+import { useListingPathState } from './hooks/useListingPathState';
+import { useMinCharsHint } from './hooks/useMinCharsHint';
+import { filterEntriesByNamePrefix } from './lib/path-input.utils';
+import { PathInput } from './ui/PathInput';
+import { FileListingView } from './ui/FileListingView';
 
 /**
  * File browser: debounced listing wire path, name prefix filter, toasts, responsive shell.

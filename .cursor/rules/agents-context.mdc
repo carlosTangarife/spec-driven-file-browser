@@ -1,5 +1,5 @@
 ---
-description: Project context, OpenSpec+Git workflow, Screaming Architecture, and React/NestJS rules. Read AGENTS.md before implementing or reviewing code.
+description: Project context, OpenSpec+Git workflow, Screaming Architecture, Clean mapping for React slices, and React/NestJS rules. Read AGENTS.md before implementing or reviewing code.
 globs: ["**/*.ts", "**/*.tsx", "**/openspec/**"]
 alwaysApply: true
 ---
@@ -8,11 +8,13 @@ alwaysApply: true
 
 When implementing OpenSpec changes or writing React/NestJS code in this workspace, **read [AGENTS.md](../../AGENTS.md)** (workspace root). It is the single source of truth for:
 
-- **Workflow**: Proposal → Apply (feature branch from trunk) → Work → Archive → Commit with conventional message and diff context.
-- **Screaming Architecture**: Folder names scream what the app does (e.g. `file-browser/`, `path-file-listing/`), not framework layers (`components/`, `controllers/`).
-- **React**: Chakra UI for UI; mobile-first, fluid, pleasant UX; use a dedicated component for folders/files (e.g. tree or list with Chakra). Small files and components; single responsibility; declarative; arrow-function components; Zod; React Query; centralized request/error handling; presentational components receive only props.
-- **NestJS**: One folder per feature (module, controller, service, DTOs); no horizontal `controllers/` or `services/` folders; controller = HTTP only, service = business logic.
+- **Workflow**: Proposal → **`/feat-start-change`** (or `npm run git:feature`) → Apply → Work → Archive → **`/feat-merge-main`** (or full **`/feat-spec-close`** checklist); then **`/feat-start-change`** for the next change on trunk.
+- **OpenSpec ↔ code**: Each change’s **design.md** should include **Code layout (target)**; **openspec/README.md** explains the link. Do not implement behavior outside specs; align folder/file choices with AGENTS.
+- **Screaming Architecture**: Top-level feature folders (`file-browser/`, `path-file-listing/`) — not app-wide `components/`, `hooks/`, `controllers/`. Inside a feature, optional subfolders (`ui/`, `hooks/`, `lib/`) are allowed when the slice grows.
+- **Clean Architecture (frontend slice)**: Map code to **domain/pure** → **application/hooks** → **infrastructure** (services, fetch, toaster) → **presentation** (dumb components). Page composes. See **React feature slice structure** in AGENTS.md.
+- **React**: Chakra UI; mobile-first; presentational components = props only; services + React Query for server state; Zod on API payloads; small files; named exports; English JSDoc where needed.
+- **NestJS**: One folder per feature (module, controller, service, DTOs); thin controller, fat service; no horizontal `controllers/` / `services/` at app root.
 
-Do not implement behavior outside `openspec/changes/<change>/` specs; do not add horizontal layers that mix features.
+Do not add horizontal layers that mix features. When a spec touches both web and API, split work by **feature folders** in each app.
 
-**Unit tests (non-negotiable):** After implementing a feature, add/update Vitest unit tests with **AAA** for both `apps/api` and `apps/web` when those apps are affected. Run `npm test` (or `nx test api` and `nx test web`). Apply and archive are **not** complete if tests fail; fix and iterate — do not skip or ignore tests.
+**Unit tests (non-negotiable):** After implementing a feature, add/update Vitest unit tests with **AAA** for both `apps/api` and `apps/web` when those apps are affected. Run `npm test`. Apply and archive are **not** complete if tests fail.

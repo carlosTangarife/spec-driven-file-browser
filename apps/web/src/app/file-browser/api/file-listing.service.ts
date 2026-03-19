@@ -1,9 +1,12 @@
 import { z } from 'zod';
+import type { ListEntry } from '../lib/list-entry.types';
 
 /**
  * Fetches directory listing from the path-file-listing API.
  * Wire path: relative, forward slashes; empty = root.
  */
+
+export type { ListEntry };
 
 /** Thrown when the listing HTTP response is not OK; includes HTTP status for UI handling. */
 export class ListingRequestError extends Error {
@@ -14,12 +17,6 @@ export class ListingRequestError extends Error {
     super(message ?? `Listing error: ${status}`);
     this.name = 'ListingRequestError';
   }
-}
-
-export interface ListEntry {
-  name: string;
-  type: 'file' | 'directory';
-  relativePath?: string;
 }
 
 /** Zod schema aligned with the API `ListEntry` shape (optional `relativePath`). */

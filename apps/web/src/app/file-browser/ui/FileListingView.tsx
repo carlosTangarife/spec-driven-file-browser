@@ -5,7 +5,7 @@ import {
   Stack,
   Text,
 } from '@chakra-ui/react';
-import type { ListEntry } from './file-listing.service';
+import type { ListEntry } from '../lib/list-entry.types';
 
 export type FileListingViewProps = {
   entries: ListEntry[] | undefined;

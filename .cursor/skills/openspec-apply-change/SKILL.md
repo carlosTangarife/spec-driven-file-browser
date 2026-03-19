@@ -28,7 +28,7 @@ Implement tasks from an OpenSpec change.
 
    Before implementing, work must happen on a **feature branch** created from trunk (e.g. `main` or `master`), not on trunk itself.
    - If already on a branch named like `feature/<name>` or `feat/<name>` for this change, continue.
-   - Otherwise: fetch latest trunk, create and checkout a branch `feature/<change-name>` (use the OpenSpec change name in kebab-case). Use the repo’s default branch (commonly `main` or `master`). Example:
+   - Otherwise: prefer **`npm run git:feature -- <change-name>`** from the repo root (see **`/feat-start-change`**), or manually:
      ```bash
      git fetch origin && git checkout main && git pull
      git checkout -b feature/<change-name>

@@ -8,6 +8,7 @@ This document is the **single source of truth** for business context, **workflow
 2. **Apply** — When starting implementation (`/opsx:apply` or openspec-apply-change):
    - **Trunk-based**: From a clean **trunk** (e.g. `main` / `master`), create a **feature branch**: `feature/<change-name>` (kebab-case from the OpenSpec change name). All implementation happens on this branch.
    - Do not implement on trunk; always work on the feature branch created at apply time.
+   - **Automation**: Run **`/feat-start-change <change-name>`** or **`npm run git:feature -- <change-name>`** immediately before (or as the first step of) apply so the branch always exists.
 3. **Work** — Implement tasks from `tasks.md` on that feature branch; keep commits focused.
 4. **Unit tests (mandatory)** — After each feature slice (and before considering **apply** or **archive** complete), add or update **unit tests** for both **`apps/api`** and **`apps/web`** that touch the change. Use the **AAA** pattern (Arrange, Act, Assert) in every test. Stack: **Vitest** (same runner for API Node tests and web). Run `npm test` (or `nx test api` and `nx test web`). **Do not skip, ignore, or disable tests** to “pass” the build; if tests fail, **iterate until green**. A change is **not** done while `api:test` or `web:test` fails. No `passWithNoTests: true` workaround for projects that must have coverage for the feature.
 5. **Archive** — When the change is done **and all unit tests pass**, run archive (e.g. `/opsx:archive` or openspec-archive-change). The change directory moves to `openspec/changes/archive/YYYY-MM-DD-<change-name>/`.
@@ -17,7 +18,17 @@ This document is the **single source of truth** for business context, **workflow
      - Title: `feat(api): implement path-file-listing (cross-platform-path-file-listing)`
      - Body: Short summary of what was implemented; list main areas (e.g. path resolution, Nest module, DTOs). Optionally include a one-line “Context: archived OpenSpec change …”.
    - This commit captures the full context of the change for future readers and for Cursor (good diff = good context).
-   - **Automation (Cursor)**: Run **`/feat-merge-main`** to **auto-generate** that commit message from **`git diff` vs `main`/`master`** and, when present, the **latest folder** under `openspec/changes/archive/` (read `proposal.md`, change name), then **merge the feature branch into trunk** locally. No interactive prompt unless the diff is ambiguous.
+   - **Automation (Cursor)**: Run **`/feat-merge-main`** to **auto-generate** that commit message from **`git diff` vs `main`/`master`** and, when present, the **latest folder** under `openspec/changes/archive/` (read `proposal.md`, change name), then **merge the feature branch into trunk** locally. No interactive prompt unless the diff is ambiguous. After the merge you are **on trunk** (`main` / `master`), ready for the next change.
+7. **Next spec** — After the merge, start the next OpenSpec change from trunk using **`/feat-start-change <next-change-name>`** (or `npm run git:feature -- <next-change-name>`), then continue with proposal/apply as usual.
+
+### Cursor command cheat sheet (Git + OpenSpec)
+
+| Phase | Command |
+|-------|---------|
+| Before first commit of implementation | **`/feat-start-change <change-name>`** or `npm run git:feature -- <change-name>` |
+| Implement | **`/opsx:apply`** … |
+| Finish OpenSpec folder + specs | **`/opsx:archive`** … |
+| Commit + merge to trunk + stay on `main` | **`/feat-merge-main`** (or run the full close sequence **`/feat-spec-close`**, which documents archive → merge) |
 
 ## Business objective
 
@@ -53,9 +64,48 @@ The product is a **file browser**: the API is the source of truth for the listin
 
 Folder and file names must **scream what the application does** (domain and capabilities), not the framework or technical layer.
 
-- **React**: Structure by **feature/capability**, not by type. Prefer `file-browser/`, `path-picker/` at the top level. Avoid root-level folders like `components/`, `hooks/`, `pages/` that hide what the app does. Inside a feature you may have `FileList.tsx`, `useFileListing.ts`, `fileListing.service.ts` — the feature name is what “screams”.
+- **React**: Structure by **feature/capability**, not by type. Prefer `file-browser/`, `path-picker/` at the top level. Avoid **app-wide** folders like `src/components/`, `src/hooks/`, `src/pages/` that hide what the app does. Inside a **named feature folder** (e.g. `file-browser/`), you may keep files flat **or** use **optional subfolders** (see *React feature slice structure* below) — still one capability per top-level feature name.
 - **NestJS**: Structure by **feature/capability**, not by layer. Prefer `path-file-listing/`, `file-browser/` (or domain names like `listing/`). Avoid root-level `controllers/`, `services/`, `modules/` that mix all features. Each feature folder contains its module, controller, service, DTOs; the folder name is the capability.
 - **Rule of thumb**: A newcomer should understand “what this app does” from the folder names alone, without opening files.
+
+## React feature slice structure (Clean Architecture mapping)
+
+A **vertical slice** (e.g. `apps/web/src/app/file-browser/`) should respect **dependency direction**: UI and framework details depend inward; **pure rules and types** do not depend on React or Chakra.
+
+| Concern | Role (Clean-ish) | Typical contents | Depends on |
+|--------|-------------------|------------------|------------|
+| **Domain / pure** | Entities + pure use rules | Types shared with API, pure parsers (`splitPathInput`), filters (`filterEntriesByNamePrefix`), no `fetch`, no React | Nothing in the app |
+| **Application** | Orchestration | Hooks that compose state, React Query, and callbacks (`useListingPathState`, `useFileListingQuery`) | Domain pure + infrastructure |
+| **Infrastructure** | I/O + adapters | `fetch` + Zod (`file-listing.service.ts`), toaster wiring (`listing-toaster.tsx`) | Domain types |
+| **Presentation** | UI | Presentational components (`PathInput`, `FileListingView`) — props in, events out | Nothing except props/types |
+| **Composition root** | Page / screen | `FileBrowserPage.tsx` wires hooks + presentational components | Application + presentation |
+
+**Screaming + Clean together**: The **folder name** still screams the feature (`file-browser/`). Inside, **file names** can reflect role (`*.utils.ts` for pure, `*.service.ts` for HTTP, `use*.ts` for hooks, `*Page.tsx` for the screen). This is not “layer folders at app root”; it is one feature, multiple roles.
+
+**When a slice grows** (many files, >~15 or hard to navigate), prefer **subfolders under the feature only**, for example:
+
+- `file-browser/ui/` — presentational components only.
+- `file-browser/hooks/` — hooks only.
+- `file-browser/lib/` or `file-browser/domain/` — pure functions and types (no React).
+- `file-browser/api/` or keep `*.service.ts` at feature root — HTTP + validation.
+
+Keep **barrel exports** (`index.ts`) updated so imports stay `@/app/file-browser` or relative paths that still “scream” the feature.
+
+**Smells to avoid**
+
+- Business rules duplicated in both a component and a hook — extract to domain/pure module.
+- `fetch` or React Query inside presentational components — violates AGENTS; move to services + hooks.
+- Generic utilities (`useDebouncedValue`) used by multiple features — consider `libs/shared` or `src/app/shared/` later; colocating under one feature is OK until reuse is real.
+
+## OpenSpec ↔ code layout
+
+Every OpenSpec change should stay implementable **without inventing ad-hoc folder chaos**:
+
+1. **`proposal.md` / `design.md`**: For UI/API work, add a **Code layout (target)** subsection (paths under `apps/web` / `apps/api`, feature folder name, main new files). See `openspec/README.md`.
+2. **`tasks.md`**: Tasks should name files or areas that match **Screaming** names (feature folder, not `utils/global`).
+3. **Implementers** follow this **AGENTS.md** section + the change’s **design.md**; if the spec requires behavior that would break Clean boundaries (e.g. fetch inside a dumb component), update the **design** or **spec** first.
+
+This ties **openspec** to **how** we code, not only **what** we ship.
 
 ## React rules (apps/web)
 

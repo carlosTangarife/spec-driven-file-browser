@@ -147,6 +147,8 @@ Target archive directory already exists.
 3. Wait until a different date to archive
 ```
 
+**After archive (Git)** — Archiving only moves OpenSpec files. To **commit**, **merge into trunk**, and **end on `main`/`master`** for the next spec, run **`/feat-merge-main`** on the feature branch (see **AGENTS.md**). The combined checklist is documented as **`/feat-spec-close`** (archive → merge).
+
 **Guardrails**
 - Always prompt for change selection if not provided
 - Use artifact graph (openspec status --json) for completion checking

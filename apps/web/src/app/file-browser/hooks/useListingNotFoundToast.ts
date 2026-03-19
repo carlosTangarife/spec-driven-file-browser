@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
-import { ListingRequestError } from './file-listing.service';
-import { listingToaster } from './listing-toaster';
+import { ListingRequestError } from '../api/file-listing.service';
+import { listingToaster } from '../api/listing-toaster';
 
 /**
  * Shows a friendly English toast when the listing API returns 404.
@@ -8,7 +8,7 @@ import { listingToaster } from './listing-toaster';
 export const useListingNotFoundToast = (
   error: unknown,
   listingPath: string,
-) => {
+): void => {
   const lastToastKey = useRef<string | null>(null);
 
   useEffect(() => {

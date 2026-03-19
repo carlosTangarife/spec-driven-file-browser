@@ -9,6 +9,8 @@ Implement tasks from an OpenSpec change.
 
 **Input**: Optionally specify a change name (e.g., `/opsx:apply add-auth`). If omitted, check if it can be inferred from conversation context. If vague or ambiguous you MUST prompt for available changes.
 
+**Git (before coding)** — Per **AGENTS.md**, implementation must run on **`feature/<change-name>`**, not on `main`/`master`. If not already on that branch, run **`/feat-start-change <change-name>`** or `npm run git:feature -- <change-name>` first.
+
 **Steps**
 
 1. **Select the change**

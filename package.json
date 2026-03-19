@@ -10,7 +10,8 @@
     "build:web": "nx build web",
     "test": "nx run-many -t test --projects=api,web",
     "test:api": "nx test api",
-    "test:web": "nx test web"
+    "test:web": "nx test web",
+    "git:feature": "node scripts/git-feature-from-trunk.mjs"
   },
   "private": true,
   "devDependencies": {

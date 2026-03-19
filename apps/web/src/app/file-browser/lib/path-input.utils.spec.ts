@@ -4,7 +4,7 @@ import {
   splitPathInput,
   PATH_INPUT_MAX_LENGTH,
 } from './path-input.utils';
-import type { ListEntry } from './file-listing.service';
+import type { ListEntry } from './list-entry.types';
 
 describe('splitPathInput', () => {
   it('treats input without slash as root listing and full string as name prefix', () => {

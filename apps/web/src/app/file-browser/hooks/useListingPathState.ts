@@ -3,7 +3,7 @@ import { useCallback, useEffect, useMemo, useState, type KeyboardEvent } from 'r
 import {
   PATH_INPUT_MAX_LENGTH,
   splitPathInput,
-} from './path-input.utils';
+} from '../lib/path-input.utils';
 import { useDebouncedValue } from './useDebouncedValue';
 
 const DEBOUNCE_MS = 300;

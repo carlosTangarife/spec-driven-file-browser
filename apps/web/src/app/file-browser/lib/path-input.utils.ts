@@ -1,4 +1,4 @@
-import type { ListEntry } from './file-listing.service';
+import type { ListEntry } from './list-entry.types';
 
 const MAX_INPUT_LENGTH = 200;
 
