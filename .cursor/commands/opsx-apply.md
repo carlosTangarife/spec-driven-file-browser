@@ -32,6 +32,8 @@ Work happens on **`feature/<change-name>`**, not on the integration branch. The 
 
 **When done:** **`/opsx:archive`** (archives OpenSpec and runs commit + merge to integration branch in the same session by default). Details: **AGENTS.md** § Workflow.
 
+**Code quality (mandatory):** When implementing tasks, follow **AGENTS.md** § *Code quality (mandatory)* — one primary unit per file, explicit return types on exports, thin components/controllers, SOLID, low cyclomatic complexity (`apps/web` and `apps/api`).
+
 ---
 
 **Steps**

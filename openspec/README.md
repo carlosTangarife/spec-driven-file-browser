@@ -9,6 +9,7 @@ OpenSpec changes live under `openspec/changes/` (active) and `openspec/changes/a
 **Before implementing** any change, read **[AGENTS.md](../AGENTS.md)** at the repo root. It defines:
 
 - **Screaming Architecture** (feature folders, not horizontal layers).
+- **Code quality (mandatory)** — one primary unit per file, explicit return types on exports, thin components/controllers, SOLID, low cyclomatic complexity (web + API). **Not optional** for new code; `design.md` / `tasks.md` should align file splits with these rules.
 - **How a React feature slice maps to Clean-style boundaries** (domain vs application vs infrastructure vs UI).
 - **What to put in OpenSpec `design.md`** so implementation matches structure (see *OpenSpec ↔ code layout* in AGENTS.md).
 

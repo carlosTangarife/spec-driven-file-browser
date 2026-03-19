@@ -24,6 +24,8 @@ When ready to implement, run /opsx:apply
 
 **Screaming Architecture (every feature)** — Read **AGENTS.md** at the repo root. Apply it to **both** **frontend** (`apps/web`, vertical feature folders) **and** **backend** (`apps/api`, NestJS: one **capability folder** per feature — module, controller, service, DTOs — **not** generic root-level `controllers/` / `services/` / `modules/` mixing unrelated features). **`design.md` MUST** include **Code layout (target)** naming intended feature paths for web and/or API when those apps are in scope.
 
+**Code quality (mandatory)** — **AGENTS.md** § *Code quality (mandatory)*: proposals and **`design.md`** / **`tasks.md`** MUST plan files so each file has **one primary** component/hook/service/etc., exports use **explicit return types**, UI/controllers stay **thin**, and complexity stays **low** (SOLID, readable). OpenSpec artifacts are not optional on these points.
+
 ---
 
 **Input**: The user's request should include a change name (kebab-case) OR a description of what they want to build.

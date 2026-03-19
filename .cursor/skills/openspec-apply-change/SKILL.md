@@ -72,6 +72,8 @@ Implement tasks from an OpenSpec change.
    - **spec-driven**: proposal, specs, design, tasks
    - Other schemas: follow the contextFiles from CLI output
 
+   **Mandatory coding rules:** Read **[AGENTS.md](../../AGENTS.md)** § **Code quality (mandatory)** before writing or editing code. Every new file and change MUST follow: one primary unit per file, explicit return types on exports, thin components/controllers (logic in services/hooks/pure helpers), SOLID, low cyclomatic complexity. Applies to `apps/web` and `apps/api`.
+
 6. **Show current progress**
 
    Display:

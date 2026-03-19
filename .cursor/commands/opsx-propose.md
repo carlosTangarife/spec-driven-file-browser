@@ -42,6 +42,7 @@ Work for this change happens on **`feature/<change-name>`**, not on the integrat
 - **Frontend (`apps/web`)**: Vertical **feature** folders (e.g. `file-browser/`); optional subfolders (`ui/`, `hooks/`, `lib/`, `api/`) inside the feature when the slice grows — not anonymous app-wide `components/` / `hooks/` / `pages/`.
 - **Backend (`apps/api`, NestJS)**: Apply the **same** idea — structure by **capability/feature**, not by technical layer at the app root. New or extended API work belongs under a **named feature folder** (e.g. `path-file-listing/`, `file-browser/`) containing module, controller, service, DTOs for that capability. **Do not** plan work that lands in generic root-level `controllers/`, `services/`, or `modules/` folders that mix many features.
 - **`design.md`**: MUST include a **Code layout (target)** subsection that names the intended **feature folder(s)** for web and/or API (paths under `apps/web/src/app/…` and `apps/api/src/app/…` or the repo’s equivalent), aligned with Screaming Architecture on **both** sides when the change touches them.
+- **Code quality (mandatory):** **AGENTS.md** § *Code quality (mandatory)* — plan **one primary** component/hook/service per file where practical, thin UI/controllers, explicit return types, low complexity. `tasks.md` SHOULD name files that respect this.
 
 ---
 

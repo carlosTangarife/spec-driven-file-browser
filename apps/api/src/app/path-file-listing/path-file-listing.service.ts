@@ -19,11 +19,11 @@ import { MAX_TREE_NODES } from './tree-depth';
 @Injectable()
 export class PathFileListingService {
   /**
-   * Lists immediate children of the directory identified by wirePath.
-   * Wire path: relative under allowed root, forward slashes; empty or "." = root.
-   * Throws on missing path, non-directory, or traversal attempt.
+   * Resolves wire path to an existing directory under the allowed root, or throws.
    */
-  async list(wirePath: string | undefined): Promise<ListEntryDto[]> {
+  private async resolveExistingDirectory(
+    wirePath: string | undefined,
+  ): Promise<{ resolved: string; segments: string[] }> {
     const { allowedRoot } = getPathFileListingConfig();
     const segments = parseWirePath(wirePath);
     const resolved = resolvePath(allowedRoot, segments);
@@ -46,6 +46,17 @@ export class PathFileListingService {
     if (!stats.isDirectory()) {
       throw new BadRequestException('Path is not a directory');
     }
+
+    return { resolved, segments };
+  }
+
+  /**
+   * Lists immediate children of the directory identified by wirePath.
+   * Wire path: relative under allowed root, forward slashes; empty or "." = root.
+   * Throws on missing path, non-directory, or traversal attempt.
+   */
+  async list(wirePath: string | undefined): Promise<ListEntryDto[]> {
+    const { resolved, segments } = await this.resolveExistingDirectory(wirePath);
 
     const entries = await readdir(resolved, { withFileTypes: true });
     const baseRelative = segments.length === 0 ? '' : segments.join('/') + '/';
@@ -76,31 +87,7 @@ export class PathFileListingService {
     wirePath: string | undefined,
     depth: number,
   ): Promise<TreeNodeDto[]> {
-    const { allowedRoot } = getPathFileListingConfig();
-    const segments = parseWirePath(wirePath);
-    const resolved = resolvePath(allowedRoot, segments);
-
-    if (!isUnderRoot(allowedRoot, resolved)) {
-      throw new ForbiddenException('Path is outside allowed root');
-    }
-
-    let stats;
-    try {
-      stats = await stat(resolved);
-    } catch (err: unknown) {
-      const code = (err as NodeJS.ErrnoException)?.code;
-      if (code === 'ENOENT') {
-        throw new NotFoundException({
-          message: 'Path not found',
-          path: wirePath ?? '.',
-        });
-      }
-      throw err;
-    }
-
-    if (!stats.isDirectory()) {
-      throw new BadRequestException('Path is not a directory');
-    }
+    const { resolved, segments } = await this.resolveExistingDirectory(wirePath);
 
     const wirePrefix = segments.length === 0 ? '' : segments.join('/');
     const counter = { count: 0 };

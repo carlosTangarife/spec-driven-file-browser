@@ -13,10 +13,11 @@ description: NestJS 11 + TypeScript in this workspace. Use when implementing or 
 
 ## Conventions
 
-1. **Feature-based modules**: One feature per folder (e.g. `file-listing/` with module, controller, service). Folder name reflects the capability (Screaming Architecture).
-2. **SOLID**: Single responsibility; inject dependencies via constructor; depend on abstractions where it helps.
-3. **DTOs**: Use classes and `class-validator`/`class-transformer` for request/response validation when needed.
-4. **Errors**: Use appropriate HTTP status (400, 403, 404) and Nest exceptions (`BadRequestException`, `NotFoundException`, etc.).
+1. **AGENTS.md — Code quality (mandatory)**: One primary responsibility per file (controller / service / DTO module as appropriate); explicit return types on public service methods and controller handlers where applicable; thin controllers; avoid high cyclomatic complexity in services—extract helpers or classes. Read **AGENTS.md** § *Code quality (mandatory)* before large edits.
+2. **Feature-based modules**: One feature per folder (e.g. `file-listing/` with module, controller, service). Folder name reflects the capability (Screaming Architecture).
+3. **SOLID**: Single responsibility; inject dependencies via constructor; depend on abstractions where it helps.
+4. **DTOs**: Use classes and `class-validator`/`class-transformer` for request/response validation when needed.
+5. **Errors**: Use appropriate HTTP status (400, 403, 404) and Nest exceptions (`BadRequestException`, `NotFoundException`, etc.).
 
 ## Module layout (per feature)
 

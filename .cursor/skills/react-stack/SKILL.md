@@ -13,11 +13,12 @@ description: React 18 + TypeScript in this workspace. Use when implementing or r
 
 ## Conventions
 
-1. **Presentational UI**: Components receive data via props; no direct API calls or business rules in components.
-2. **Logic in services**: API calls and data shaping live in services; hooks (e.g. `useQuery`) use those services.
-3. **Feature-based**: Group by feature (e.g. `file-browser/`) with components, hooks, and services inside.
-4. **Named exports**: Prefer `export const Component`; file name matches main export.
-5. **Typing**: No `any`; type props, state, and API responses explicitly.
+1. **AGENTS.md — Code quality (mandatory)**: One primary unit per file (typically one component or one hook per file); explicit return types on exported functions/components; thin components—extract logic to hooks/services/pure helpers; keep cyclomatic complexity low. Read the full section in **AGENTS.md** before large edits.
+2. **Presentational UI**: Components receive data via props; no direct API calls or business rules in components.
+3. **Logic in services**: API calls and data shaping live in services; hooks (e.g. `useQuery`) use those services.
+4. **Feature-based**: Group by feature (e.g. `file-browser/`) with components, hooks, and services inside.
+5. **Named exports**: Prefer `export const Component`; file name matches main export.
+6. **Typing**: No `any`; type props, state, and API responses explicitly; exported functions MUST have explicit return types per AGENTS.md.
 
 ## React Query usage
 

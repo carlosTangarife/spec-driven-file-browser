@@ -1,6 +1,6 @@
 # Agent context – File Browser Workspace
 
-This document is the **single source of truth** for business context, **workflow (OpenSpec + Git)**, and **coding rules (vertical slices)**. Cursor and other agents MUST use it when running specs or implementing changes.
+This document is the **single source of truth** for business context, **workflow (OpenSpec + Git)**, **vertical-slice layout**, and **mandatory code quality** (one unit per file, explicit return types, thin boundaries, SOLID, readable complexity). Cursor and other agents MUST use it when running specs or implementing changes.
 
 ## Workflow (OpenSpec + Git)
 
@@ -57,6 +57,39 @@ The product is a **file browser**: the API is the source of truth for the listin
 - **SOLID**: Single responsibility, dependency injection, interfaces where they add value.
 - **Vertical slices**: One slice per capability/feature; each slice owns its UI, API calls, and types (see below). No horizontal “reducers” or “controllers” folders that mix many features.
 
+## Code quality (mandatory)
+
+These rules apply to **`apps/web`** and **`apps/api`**. They are **not optional** for new code and SHOULD be applied when touching existing files. OpenSpec **`design.md`** tasks SHOULD respect file boundaries that follow this section.
+
+### One primary unit per file
+
+- Each file MUST have **one clear primary responsibility** and typically **one main exported unit**: e.g. one React component, one hook (`useThing.ts`), one service class, one controller class, one Nest module, or one small **cohesive** group of pure helpers in a `*.utils.ts` / `*.helpers.ts` file (same domain, same feature).
+- Do **not** pack many unrelated **functions**, **classes**, or **components** in a single file. If a file grows long, mixes concerns, or accumulates several top-level exports of different roles, **split** into additional files under the same feature folder.
+- **Exception**: `index.ts` barrel files may re-export; test files (`*.spec.ts`) may contain multiple `it` blocks; tiny **private** helpers next to a single primary export are OK only when they stay short and serve that export only.
+
+### Explicit return types
+
+- Every **exported** function and every **public** class method MUST have an **explicit** return type (TypeScript). Do not rely on inference for exported APIs.
+- React components: use `React.FC<Props>` or an explicit return type such as `JSX.Element` / `React.ReactElement` on the component.
+- **Constructors** and obvious trivial getters may follow project ESLint/TypeScript defaults if already configured; when in doubt, annotate.
+
+### Thin surfaces, SOLID, low complexity
+
+- **React components and Nest controllers** MUST stay **thin**: layout, wiring, validation at the boundary, delegation. **Business rules and branching** belong in **services**, **pure domain helpers**, or **hooks** that orchestrate—**not** buried in large JSX or controller methods.
+- Apply **SOLID** (especially **S**ingle responsibility): extract when a function or class does more than one reason to change.
+- **Cyclomatic complexity**: prefer **early returns**, **guard clauses**, and **small** functions. Avoid deep nesting; if logic branches heavily, extract named helpers or split into multiple functions/classes/files.
+- Code MUST be **easy to read** at a glance: clear names, short functions, shallow control flow.
+
+### Backend (NestJS) alignment
+
+- **Controllers**: HTTP + DTO validation + delegate to service—**no** filesystem or domain rules inline.
+- **Services**: domain logic and I/O coordination; split into additional classes/files if a service class grows too large or mixes unrelated behaviors.
+
+### Frontend (React) alignment
+
+- Presentational components: **props in, UI out**—see *React rules* below; heavy conditional trees in JSX are a smell—move conditions to hooks or pure helpers.
+- Hooks: orchestration and React state; call services for I/O; keep hook bodies readable (extract `useCallback` bodies or helpers when complexity grows).
+
 ## Screaming Architecture (React and NestJS)
 
 Folder and file names must **scream what the application does** (domain and capabilities), not the framework or technical layer.
@@ -102,15 +135,15 @@ Every OpenSpec change should stay implementable **without inventing ad-hoc folde
 2. **`tasks.md`**: Tasks should name files or areas that match **Screaming** names (feature folder, not `utils/global`).
 3. **Implementers** follow this **AGENTS.md** section + the change’s **design.md**; if the spec requires behavior that would break Clean boundaries (e.g. fetch inside a dumb component), update the **design** or **spec** first.
 
-This ties **openspec** to **how** we code, not only **what** we ship.
+This ties **openspec** to **how** we code, not only **what** we ship. **`design.md` Code layout** and **`tasks.md` file lists** MUST align with **Code quality (mandatory)** (one primary unit per file, thin components, explicit return types on new exports).
 
 ## React rules (apps/web)
 
 - **UI library**: **Chakra UI** for all UI (Box, Stack, Button, Icon, etc.). Use Chakra primitives and tokens; keep the interface **fluid**, **clear**, and **mobile-first** (touch-friendly targets, responsive spacing, no cramped layouts).
 - **Rendering folders and files**: Prefer a **dedicated presentational component** (e.g. `FileTree`, `FolderList`, or collapsible list) built with Chakra: clear visual hierarchy (folder vs file), expand/collapse for directories, adequate tap targets on mobile. Data comes from hooks; the component only receives and renders.
 - **Vertical slice**: One folder per feature (e.g. `file-browser/`). All components, hooks, services, and types for that feature live inside it.
-- **Small files, single responsibility**: No large files. One component (or one hook, one service) per file. If a file grows beyond ~150 lines, split into smaller components or extract logic. Each file has a single, clear responsibility.
-- **Small, focused components**: Components do one thing (e.g. render a list item, a button, a status message). Compose small components instead of building large ones. Prefer many small files over few large ones.
+- **Small files, single responsibility**: No large files. **Normative detail:** see **Code quality (mandatory)** — one primary export per file; split when a file mixes roles or grows hard to read. If a file grows beyond ~150 lines, split or extract logic. Each file has a single, clear responsibility.
+- **Small, focused components**: Components do one thing (e.g. render a list item, a button, a status message). Compose small components instead of building large ones. Prefer many small files over few large ones; **do not** stuff multiple unrelated components into one file.
 - **Declarative over imperative**: Describe *what* to render (state → UI), not *how* to update the DOM step by step. Avoid refs and direct DOM manipulation for rendering; use state and composition. Use React Query for server state instead of manual loading flags and useEffect fetches.
 - **Components as arrow functions**: Define components with arrow functions and explicit props types. Example: `export const FileRow: React.FC<FileRowProps> = ({ name, type }) => ( ... );`. Named exports only; file name matches the component (e.g. `FileRow.tsx` → `FileRow`).
 - **Zod for validation**: Use **Zod** to validate API responses and form/input data. Define schemas in the feature (or shared) and parse before using data. Keeps types and runtime validation in sync.
@@ -127,7 +160,7 @@ This ties **openspec** to **how** we code, not only **what** we ship.
 - **Vertical slice (Screaming Architecture)**: One folder per feature/capability (e.g. `path-file-listing/`). The folder name is the capability. Inside: `path-file-listing.module.ts`, `path-file-listing.controller.ts`, `path-file-listing.service.ts`, and optionally `dto/`. No root-level `controllers/` or `services/` that mix features.
 - **Module**: Wires controller + service; exports only what other modules need. No “god” module importing every feature.
 - **Controller**: HTTP only — validation (e.g. DTOs + ValidationPipe), parsing, calling the service, mapping to response DTOs. No filesystem access, no business logic. Thin layer.
-- **Service**: All business logic, path resolution, `fs`/`readdir`, validation against allowed root. Injectable and testable without HTTP. Single responsibility per service (one service per feature or sub-capability).
+- **Service**: All business logic, path resolution, `fs`/`readdir`, validation against allowed root. Injectable and testable without HTTP. Single responsibility per service (one service per feature or sub-capability). **Normative:** see **Code quality (mandatory)** — explicit return types on public methods; keep methods small; avoid high cyclomatic complexity (extract private methods or helpers).
 - **Small, focused modules**: One feature per module. If a module grows too large, split by sub-capability (new folder, new module), not by adding more controllers/services in the same folder.
 - **No horizontal folders**: Do not create top-level `controllers/`, `services/`, `modules/` that group by technical layer; structure by feature so the app “screams” what it does.
 - **Unit tests**: Co-locate `*.spec.ts` next to services and pure modules (e.g. path resolution); **Vitest** (Node environment) + **AAA**; test business logic without HTTP where possible.
