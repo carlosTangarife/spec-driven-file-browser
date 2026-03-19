@@ -21,7 +21,7 @@ import { ListingRequestError } from './api/file-listing.service';
 import { useDirectoryTreeQuery } from './hooks/useDirectoryTreeQuery';
 import { useFileContentQuery } from './hooks/useFileContentQuery';
 import { useLazyTreeChildren } from './hooks/useLazyTreeChildren';
-import { useListingNotFoundToast } from './hooks/useListingNotFoundToast';
+import { useListingPathNotFoundMessage } from './hooks/useListingPathNotFoundMessage';
 import { useListingPathState } from './hooks/useListingPathState';
 import { useMinCharsHint } from './hooks/useMinCharsHint';
 import { mapPreviewDisplayError } from './lib/preview-error.utils';
@@ -59,7 +59,8 @@ export const FileBrowserPage = () => {
     isFetching: treeLoading,
     error: treeError,
   } = useDirectoryTreeQuery(deferredListingPath, 1);
-  useListingNotFoundToast(treeError, deferredListingPath);
+
+  const pathNotFoundMessage = useListingPathNotFoundMessage(treeError);
 
   const treeErrorMessage = useMemo(() => {
     if (!treeError) return null;
@@ -137,6 +138,24 @@ export const FileBrowserPage = () => {
       <Container maxW="container.xl" mx="auto" width="100%">
         <Stack gap={8}>
           <Heading size="xl">File browser</Heading>
+          {pathNotFoundMessage != null ? (
+            <Box
+              role="alert"
+              width="100%"
+              borderWidth="1px"
+              borderRadius="md"
+              borderColor="red.muted"
+              bg="red.subtle"
+              p={3}
+            >
+              <Text fontWeight="semibold" colorPalette="red">
+                Path not found
+              </Text>
+              <Text fontSize="sm" mt={1} colorPalette="red">
+                {pathNotFoundMessage}
+              </Text>
+            </Box>
+          ) : null}
           <PathInput
             value={pathInput}
             onChange={setPathInput}
