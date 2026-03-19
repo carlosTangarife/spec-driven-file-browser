@@ -113,7 +113,7 @@ Context: archived OpenSpec change file-browser-listing-ux"
 
 - Print current branch (`<trunk>`). The working copy is now **on trunk**, ready for a **new** OpenSpec change.
 - Remind: `git push origin <trunk>` (and feature branch if needed) — not automatic.
-- **Next spec**: From trunk, run **`/feat-start-change <next-change-name>`** (or `npm run git:feature -- <next-change-name>`) before **`/opsx:apply`** so the next implementation uses a fresh `feature/<name>` branch (see **AGENTS.md**).
+- **Next spec**: From trunk, run **`/feat-start-change`** (infers the name when only one active OpenSpec change exists) or **`/feat-start-change <next-change-name>`** / `npm run git:feature` / `npm run git:feature -- <name>` before **`/opsx:apply`** (see **AGENTS.md**).
 
 ---
 

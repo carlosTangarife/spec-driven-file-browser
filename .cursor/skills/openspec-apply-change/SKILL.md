@@ -24,16 +24,19 @@ Implement tasks from an OpenSpec change.
 
    Always announce: "Using change: <name>" and how to override (e.g., `/opsx:apply <other>`).
 
-2. **Ensure feature branch from trunk (see AGENTS.md workflow)**
+2. **Create the feature branch automatically (mandatory — no separate user step)**
 
-   Before implementing, work must happen on a **feature branch** created from trunk (e.g. `main` or `master`), not on trunk itself.
-   - If already on a branch named like `feature/<name>` or `feat/<name>` for this change, continue.
-   - Otherwise: prefer **`npm run git:feature -- <change-name>`** from the repo root (see **`/feat-start-change`**), or manually:
+   The selected **`<name>`** is the OpenSpec change id: same as `openspec/changes/<name>/` and the folder that contains **`proposal.md`**. The Git branch **MUST** be **`feature/<name>`** — do not parse the proposal title; use the change id from step 1.
+
+   - If the current branch is already **`feature/<name>`** for this exact `<name>`, skip and state that.
+   - Otherwise, from the **OpenSpec workspace root** (the directory that contains `openspec/` and, in this repo, `package.json` with script `git:feature`), run:
      ```bash
-     git fetch origin && git checkout main && git pull
-     git checkout -b feature/<change-name>
+     npm run git:feature -- <name>
      ```
-   - Announce the branch so the user knows where work is happening.
+     This creates or checks out `feature/<name>` from `main`/`master` per **AGENTS.md**.
+   - If the script is unavailable, replicate its behavior with git (checkout trunk, pull, `git checkout -b feature/<name>` or checkout existing).
+   - If the command fails (e.g. dirty working tree), **stop**, report the error, and wait — do not implement on `main`/`master`.
+   - Announce: **Branch ready: `feature/<name>`** (user should not need **`/feat-start-change`** when using apply).
 
 3. **Check status to understand the schema**
    ```bash
@@ -160,6 +163,7 @@ What would you like to do?
 ```
 
 **Guardrails**
+- **Always run step 2** (feature branch) after the change is known — the branch name is the OpenSpec **change id**, not text extracted from `proposal.md`.
 - Never declare implementation complete or suggest archive until **`npm test`** (or scoped `nx test`) passes for affected apps
 - Keep going through tasks until done or blocked
 - Always read context files before starting (from the apply instructions output)
