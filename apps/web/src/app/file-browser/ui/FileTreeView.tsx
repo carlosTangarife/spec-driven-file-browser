@@ -36,6 +36,17 @@ const TreeRow = memo(function TreeRow({
   const branchChildren =
     isDir && expanded ? (loadedChildren[node.path] ?? []) : [];
 
+  const handleDirectoryRowClick = useCallback(
+    (e: MouseEvent<HTMLButtonElement>) => {
+      if (e.detail === 2) {
+        onDirectoryNavigate(node.path);
+        return;
+      }
+      onToggleExpand(node.path);
+    },
+    [node.path, onDirectoryNavigate, onToggleExpand],
+  );
+
   if (!isDir) {
     return (
       <Text
@@ -55,17 +66,6 @@ const TreeRow = memo(function TreeRow({
       </Text>
     );
   }
-
-  const handleDirectoryRowClick = useCallback(
-    (e: MouseEvent<HTMLButtonElement>) => {
-      if (e.detail === 2) {
-        onDirectoryNavigate(node.path);
-        return;
-      }
-      onToggleExpand(node.path);
-    },
-    [node.path, onDirectoryNavigate, onToggleExpand],
-  );
 
   return (
     <Box>

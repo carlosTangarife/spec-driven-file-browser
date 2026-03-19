@@ -2,13 +2,13 @@ import { act, renderHook } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { useMinCharsHint } from './useMinCharsHint';
 
-vi.mock('../api/listing-toaster', () => ({
+vi.mock('../api/listing-toaster.instance', () => ({
   listingToaster: {
     create: vi.fn(),
   },
 }));
 
-import { listingToaster } from '../api/listing-toaster';
+import { listingToaster } from '../api/listing-toaster.instance';
 
 describe('useMinCharsHint', () => {
   beforeEach(() => {

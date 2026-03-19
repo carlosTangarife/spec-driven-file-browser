@@ -65,16 +65,16 @@ Normative workflow context: **AGENTS.md** § Workflow.
 
    If user chooses sync, use Task tool (subagent_type: "general-purpose", prompt: "Use Skill tool to invoke openspec-sync-specs for change '<name>'. Delta spec analysis: <include the analyzed delta spec summary>"). Proceed to archive regardless of choice.
 
-5. **Run unit tests — `api` and `web` (mandatory — blocks archive if red)**
+5. **Run lint and unit tests — `api` and `web` (mandatory — blocks archive if red)**
 
-   From the **repository root**, run **both** apps’ unit tests and require **green** before any OpenSpec move or Git close-out:
+   From the **repository root**, require **green** **lint** (for touched apps) and **unit tests** before any OpenSpec move or Git close-out:
 
-   - **Preferred:** **`npm test`** — runs **`nx run-many -t test --projects=api,web`** (Vitest for **api** and **web**).
-   - **Equivalent:** **`npx nx test api`** and **`npx nx test web`** — **both** must exit **0**.
+   - **Preferred:** **`npm run verify`** — runs **`npm run lint`** then **`npm test`** (ESLint on **`apps/web/src`** and **`apps/api/src`**, then Vitest for **api** and **web**).
+   - **Split:** **`npm run lint`** and **`npm test`** (or **`npx nx test api`** and **`npx nx test web`**) — **all** must exit **0**.
 
-   **If either fails:** **STOP** immediately. Do **not** run step **6** (Perform the archive) or step **8** (Git close-out). Report failing output; the user fixes tests and re-runs **`/opsx:archive`**.
+   **If any fails:** **STOP** immediately. Do **not** run step **6** (Perform the archive) or step **8** (Git close-out). Report failing output; the user fixes and re-runs **`/opsx:archive`**.
 
-   Do not skip tests, ignore failures, or use workarounds (e.g. `passWithNoTests` where tests are required) to fake success. Aligns with **AGENTS.md** (Vitest, AAA).
+   Do not skip tests or lint, ignore failures, or use workarounds (e.g. `passWithNoTests` where tests are required) to fake success. Aligns with **AGENTS.md** (ESLint, Vitest, AAA).
 
 6. **Perform the archive**
 

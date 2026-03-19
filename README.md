@@ -1,57 +1,105 @@
 # File Browser Workspace
 
-Nx monorepo with **NestJS 11** (API) and **React 18** (web), following SOLID, Screaming Architecture, and feature-based structure.
+Nx monorepo with **NestJS 11** (API) and **React 18** (web): browse files and folders under a configurable **allowed root** on the host, preview UTF-8 text files, and keep behavior **spec-driven** with **OpenSpec**.
+
+## What this project is
+
+- **Backend** exposes REST endpoints for directory **listing**, a nested **tree**, and **text preview** of files (see [Swagger UI](#openapi--swagger) when the API is running).
+- **Frontend** is a **file browser** page: path field, lazy expandable tree, and side-by-side **preview** when you select a file.
+
+Screenshots (repository root with `package.json` selected — preview shows JSON):
+
+| Desktop | Mobile (narrow viewport) |
+|---------|---------------------------|
+| ![Desktop — tree + preview](./docs/readme/file-browser-desktop.png) | ![Mobile layout](./docs/readme/file-browser-mobile.png) |
+
+With a file open in the preview panel (example: `.cursor/commands/opsx-apply.md`):
+
+![Preview pane with file contents](./docs/readme/file-browser-preview.png)
+
+## Why OpenSpec
+
+Features are developed as **OpenSpec changes** under `openspec/changes/<change-id>/`: **proposal** (why), **design** (how), **specs** (what the system must do), and **tasks** (checklist). That keeps **AGENTS.md** architecture rules, **Git** (`feature/<change-id>` on **`trunk`**), and **tests** aligned so implementation does not drift from agreed behavior.
 
 ## Stack
 
-- **Nx** – monorepo and task orchestration
-- **NestJS 11** – API (`apps/api`)
-- **React 18** – frontend (`apps/web`) with **React Query**, presentational UI and logic in services
-- **TypeScript** – strict mode
+| Layer | Technology |
+|-------|------------|
+| Monorepo | **Nx** |
+| API | **NestJS 11**, **Swagger** (`/api/docs`) |
+| Web | **React 18**, **Vite**, **Chakra UI**, **TanStack Query** |
+| Tests | **Vitest** (unit), **Playwright** (web e2e), **Jest** (api e2e) |
+| Quality | **ESLint** + TypeScript |
 
 ## Commands
 
 | Command | Description |
 |--------|-------------|
-| `npm run serve:api` | Start NestJS API (default: http://localhost:3000/api) |
-| `npm run serve:web` | Start React app (Vite dev server) |
-| `npm run build:api` | Build API for production |
-| `npm run build:web` | Build web app for production |
-| `npm test` | Run Vitest unit tests for **api** and **web** (required before OpenSpec archive) |
+| `npm run dev` | API + web (API first, then Vite on port 4200) |
+| `npm run serve:api` | NestJS API → `http://localhost:3000/api` |
+| `npm run serve:web` | Vite dev server → `http://localhost:4200` (proxies `/api` to 3000) |
+| `npm run build:api` / `npm run build:web` | Production builds |
+| `npm run lint` | ESLint for `apps/web/src` and `apps/api/src` |
+| `npm test` | Vitest for **api** and **web** |
+| `npm run verify` | **`lint`** then **`npm test`** (recommended before merge/archive) |
+| `npx nx e2e web-e2e` | Playwright (starts **api:serve**; Nx runs **web:preview** first) |
+| `npx nx e2e api-e2e` | Jest e2e against a running API (see Nx `dependsOn`) |
+| `npm run git:feature -- <change-id>` | Create/switch to `feature/<change-id>` from **`trunk`** |
 
-Or with Nx:
+### OpenAPI / Swagger
 
-- `npx nx serve api`
-- `npx nx serve web`
-- `npx nx build api`
-- `npx nx build web`
-- `npx nx test api` / `npx nx test web` / `npm test`
+With the API running: **Swagger UI** → [http://localhost:3000/api/docs](http://localhost:3000/api/docs)  
+OpenAPI JSON: [http://localhost:3000/api/docs-json](http://localhost:3000/api/docs-json) (Nest default path may vary slightly; use the UI link as source of truth.)
+
+If you see a JSON 404 at `/api/docs` (`Cannot GET /api/docs`), Swagger is not mounted under the global `api` prefix — use `SwaggerModule.setup(..., { useGlobalPrefix: true })` in `apps/api/src/main.ts` and restart the API.
+
+![Swagger UI — File Browser API at /api/docs](./docs/readme/swagger-api-docs.png)
+
+## Configuration
+
+- **`FILE_LISTING_ALLOWED_ROOT`** — Absolute path the API may read. Default: `process.cwd()` (the directory used to start the server). Set explicitly in production.
+- **Symlinks / traversal** — Documented in OpenSpec **`cross-platform-path-file-listing`**.
+
+## E2E prerequisites
+
+- **Web e2e:** Nx runs **`web:preview`** and Playwright starts **`api:serve`** so `/api` is available. Optionally run **`npm run dev`** in another terminal and use Playwright **`reuseExistingServer`** (already enabled).
+- **API e2e:** Targets depend on **`api:serve`**; ensure port **3000** (or `PORT`) matches `apps/api-e2e` axios base URL.
+
+## Example: hypothetical feature — “Download file”
+
+Suppose you want a **download** action for the selected file (business-relevant, fits the file browser).
+
+1. **Branch + OpenSpec change**
+   ```bash
+   npm run git:feature -- file-browser-file-download
+   openspec new change "file-browser-file-download"
+   ```
+2. **Author** `proposal.md`, `design.md`, `specs/…`, `tasks.md` (or use **`/opsx:propose`** to scaffold).
+3. **Implement** (`/opsx:apply` or follow `tasks.md`): e.g. `GET /api/listing/download?path=…` + web button calling it.
+4. **Verify**
+   ```bash
+   npm run verify
+   npx nx e2e web-e2e
+   ```
+5. **Archive + Git** (on green): **`/opsx:archive`** — moves the change under `openspec/changes/archive/YYYY-MM-DD-file-browser-file-download/`, conventional commit, merge to **`trunk`**.
+
+Full workflow details: **`AGENTS.md`**.
 
 ## Structure
 
 ```
 file-browser-workspace/
 ├── apps/
-│   ├── api/          # NestJS 11 – feature modules under src/app
-│   ├── api-e2e/      # API e2e tests
-│   ├── web/          # React 18 + React Query – features under src/app
-│   └── web-e2e/      # Web e2e (Playwright)
-├── libs/
-│   └── shared/       # Shared types/utilities (path: @file-browser-workspace/shared)
-└── openspec/         # OpenSpec change (file-listing-api-and-ui)
+│   ├── api/              # NestJS — feature modules under src/app
+│   ├── api-e2e/          # Jest + axios e2e
+│   ├── web/              # React — features under src/app
+│   └── web-e2e/          # Playwright
+├── docs/readme/          # README screenshots
+├── libs/shared/
+└── openspec/             # Active + archived OpenSpec changes
 ```
-
-## API configuration (path-file-listing)
-
-- **`FILE_LISTING_ALLOWED_ROOT`** (env): Absolute path on the host that the listing API is allowed to read. Default: `process.cwd()`. Traversal above this root is rejected.
-- **Symlink policy**: Do not follow symlinks when resolving the requested path. Children from `readdir` are returned as-is. See OpenSpec change `cross-platform-path-file-listing`.
-
-**Verification**: Manual or e2e: run `nx serve api`, then `GET http://localhost:3000/api/listing` (root) or `GET http://localhost:3000/api/listing?path=subfolder`. For CI, run `nx build api` and optionally `nx e2e api-e2e`. Unit tests for path resolution live in `apps/api/src/app/path-file-listing/path-resolver.spec.ts` (run with a Jest/Vitest target when configured for the api project).
 
 ## Conventions
 
-- **Git**: Default integration branch is **`trunk`** (trunk-based workflow; `npm run git:feature` and **`AGENTS.md`**). Fallback to `main` / `master` if `trunk` is absent locally.
-- **API**: feature-based modules (e.g. `file-listing`); SOLID and Screaming Architecture.
-- **Web**: UI components are presentational (no business logic); data and logic live in services and React Query hooks.
-
-Scope and tasks: OpenSpec changes under `openspec/changes/`. Path listing: **`cross-platform-path-file-listing`**.’s feature folder.
+- **Git:** default integration branch **`trunk`** (`npm run git:feature`, **`AGENTS.md`**).
+- **Code:** vertical slices, thin UI, **`npm run lint`** + **`npm test`** before treating work as done.

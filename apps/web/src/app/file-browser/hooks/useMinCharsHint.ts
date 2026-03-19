@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { listingToaster } from '../api/listing-toaster';
+import { listingToaster } from '../api/listing-toaster.instance';
 
 /**
  * After 3 seconds with exactly one character in the path field, shows a hint toast (English).

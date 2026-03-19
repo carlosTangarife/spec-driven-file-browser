@@ -1,4 +1,5 @@
-export { ListingToaster, listingToaster } from './api/listing-toaster';
+export { ListingToaster } from './api/listing-toaster';
+export { listingToaster } from './api/listing-toaster.instance';
 export {
   fetchFileListing,
   ListingRequestError,

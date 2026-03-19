@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { ListingRequestError } from '../api/file-listing.service';
-import { listingToaster } from '../api/listing-toaster';
+import { listingToaster } from '../api/listing-toaster.instance';
 
 /**
  * Shows a friendly English toast when the tree/listing query ends with 404

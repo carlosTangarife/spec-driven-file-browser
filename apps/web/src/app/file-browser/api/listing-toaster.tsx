@@ -1,15 +1,7 @@
-import { Box, Text, Toaster, ToastRoot, createToaster } from '@chakra-ui/react';
+import { Box, Text, Toaster, ToastRoot } from '@chakra-ui/react';
 import type { ToastOptions } from '@chakra-ui/react';
 import type { FC, ReactNode } from 'react';
-
-/**
- * Shared toaster for listing-related notifications (404, min-length hint).
- */
-export const listingToaster = createToaster({
-  placement: 'bottom',
-  duration: 5000,
-  offsets: { bottom: '1rem' },
-});
+import { listingToaster } from './listing-toaster.instance';
 
 const RenderToaster = Toaster as FC<{
   toaster: typeof listingToaster;
