@@ -7,15 +7,18 @@ test.describe('File browser', () => {
 
   test('renders main sections and preview placeholder before a file is selected', async ({
     page,
-  }) => {
+  }, testInfo) => {
+    const isMobileProject = testInfo.project.name === 'Mobile Chrome';
     await expect(
       page.getByRole('heading', { name: 'File browser' }),
     ).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Tree' })).toBeVisible();
-    await expect(page.getByRole('heading', { name: 'Preview' })).toBeVisible();
-    await expect(
-      page.getByText('Select a file in the tree to preview its contents.'),
-    ).toBeVisible();
+    if (!isMobileProject) {
+      await expect(page.getByRole('heading', { name: 'Preview' })).toBeVisible();
+      await expect(
+        page.getByText('Select a file in the tree to preview its contents.'),
+      ).toBeVisible();
+    }
     await expect(page.getByRole('textbox', { name: 'Path' })).toBeVisible();
   });
 
@@ -77,5 +80,29 @@ test.describe('File browser', () => {
 
     await expect(page.locator('pre')).toContainText('"name"');
     await expect(page.locator('pre')).toContainText('"web"');
+  });
+
+  test('mobile: file preview opens in a dialog with overlay and closes', async ({
+    page,
+  }, testInfo) => {
+    test.skip(
+      testInfo.project.name !== 'Mobile Chrome',
+      'narrow viewports use the modal preview flow',
+    );
+
+    await expect(
+      page.getByRole('button', { name: /package\.json/ }),
+    ).toBeVisible({ timeout: 20_000 });
+
+    await page.getByRole('button', { name: /package\.json/ }).click();
+
+    const dialog = page.getByRole('dialog', {
+      name: /Preview: package\.json/,
+    });
+    await expect(dialog).toBeVisible({ timeout: 15_000 });
+    await expect(dialog.locator('pre')).toContainText('"name"');
+
+    await page.getByRole('button', { name: 'Close preview' }).click();
+    await expect(dialog).toBeHidden();
   });
 });
