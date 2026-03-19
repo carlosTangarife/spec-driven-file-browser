@@ -72,11 +72,11 @@ The web application SHALL render directory contents as a **tree** (nested outlin
 
 ### Requirement: Expand/collapse vs directory navigation
 
-The tree SHALL support **expanding and collapsing** directory nodes without changing the current path when the user uses the **dedicated expand control** (e.g. chevron). **Navigating** to a directory (updating the **path input** and fetching the tree for that anchor) SHALL occur on a distinct gesture from expand-only interaction (e.g. **double-click** on the directory row or an explicit “open” action), documented in the UI implementation.
+The tree SHALL support **expanding and collapsing** directory nodes without changing the current path when the user activates a **primary click** on the **directory row** (full-row or equivalent large hit target). A **chevron** or similar icon MAY appear but SHALL NOT be the only clickable region for expand/collapse. **Navigating** to a directory (updating the **path input** and fetching the tree for that anchor) SHALL occur on a distinct gesture from expand-only interaction (e.g. **double-click** on the directory row or an explicit “open” action), documented in the UI implementation.
 
-#### Scenario: Chevron expands without changing path
+#### Scenario: Row click expands without changing path
 
-- **WHEN** the user activates only the expand/collapse control for a directory that has unloaded or hidden children
+- **WHEN** the user activates a **single-click** on the directory row (outside any documented navigate-only control) to toggle expansion
 - **THEN** the subtree loads or toggles visibility per lazy-load rules and the **path input** value SHALL remain unchanged unless a separate navigate gesture occurs
 
 #### Scenario: Navigate gesture updates path and refetches tree
@@ -133,4 +133,23 @@ New or changed hooks and services for **tree** and **file preview** SHALL includ
 
 - **WHEN** implementation adds tree or preview data fetching
 - **THEN** at least one test covers success and one failure path for parsing or error handling using Arrange–Act–Assert
+
+### Requirement: Listing wire path for nested input without trailing slash
+
+When the trimmed path input contains at least one `/` and does **not** end with `/`, the application SHALL derive the **listing wire path** as the full trimmed path with trailing slashes removed, and SHALL use an empty **name prefix** for that input shape.
+
+#### Scenario: Nested path without final slash lists that directory
+
+- **WHEN** the user types `apps/web` (no trailing slash) and debounce or submit applies
+- **THEN** listing and tree requests SHALL use wire path `apps/web` and SHALL NOT use wire path `apps` with a separate **name prefix** of `web`
+
+#### Scenario: Root-level segment without slash keeps name prefix
+
+- **WHEN** the user types `Documents` with no `/` in the input
+- **THEN** the application SHALL keep **root** as listing wire path and SHALL use `Documents` as the **name prefix** per existing rules
+
+#### Scenario: Trailing slash unchanged
+
+- **WHEN** the user types `apps/web/`
+- **THEN** the listing wire path SHALL be `apps/web` and the name prefix SHALL be empty
 

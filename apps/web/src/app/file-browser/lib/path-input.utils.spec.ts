@@ -14,10 +14,10 @@ describe('splitPathInput', () => {
     });
   });
 
-  it('splits parent path and final segment when slash is present without trailing slash', () => {
+  it('uses full wire path when nested without trailing slash', () => {
     expect(splitPathInput('apps/web')).toEqual({
-      listingWirePath: 'apps',
-      namePrefix: 'web',
+      listingWirePath: 'apps/web',
+      namePrefix: '',
     });
   });
 

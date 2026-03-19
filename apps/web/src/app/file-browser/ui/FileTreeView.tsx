@@ -1,5 +1,5 @@
 import { Box, HStack, Spinner, Stack, Text } from '@chakra-ui/react';
-import { memo, useCallback, type SyntheticEvent } from 'react';
+import { memo, useCallback, type MouseEvent } from 'react';
 import type { DirectoryTreeNode } from '../api/file-listing.service';
 
 export type FileTreeViewProps = {
@@ -36,10 +36,6 @@ const TreeRow = memo(function TreeRow({
   const branchChildren =
     isDir && expanded ? (loadedChildren[node.path] ?? []) : [];
 
-  const stop = useCallback((e: SyntheticEvent) => {
-    e.stopPropagation();
-  }, []);
-
   if (!isDir) {
     return (
       <Text
@@ -60,41 +56,41 @@ const TreeRow = memo(function TreeRow({
     );
   }
 
+  const handleDirectoryRowClick = useCallback(
+    (e: MouseEvent<HTMLButtonElement>) => {
+      if (e.detail === 2) {
+        onDirectoryNavigate(node.path);
+        return;
+      }
+      onToggleExpand(node.path);
+    },
+    [node.path, onDirectoryNavigate, onToggleExpand],
+  );
+
   return (
     <Box>
       <HStack
+        as="button"
+        type="button"
         gap={1}
         pl={`${pad}px`}
         py={1}
         alignItems="center"
         fontSize="sm"
+        width="100%"
+        textAlign="left"
+        cursor="pointer"
+        borderRadius="md"
+        aria-expanded={expanded}
+        fontWeight="semibold"
+        userSelect="none"
+        onClick={handleDirectoryRowClick}
+        title="Click to expand or collapse. Double-click to open this folder in the path field."
       >
-        <Text
-          as="button"
-          type="button"
-          aria-expanded={expanded}
-          flexShrink={0}
-          w="6"
-          textAlign="center"
-          cursor="pointer"
-          userSelect="none"
-          onClick={(e) => {
-            stop(e);
-            onToggleExpand(node.path);
-          }}
-        >
+        <Text as="span" flexShrink={0} w="6" textAlign="center" aria-hidden>
           {expanded ? '▼' : '▶'}
         </Text>
-        <Text
-          as="button"
-          type="button"
-          flex="1"
-          textAlign="left"
-          fontWeight="semibold"
-          cursor="pointer"
-          onDoubleClick={() => onDirectoryNavigate(node.path)}
-          title="Double-click to open this folder in the path field"
-        >
+        <Text as="span" flex="1" textAlign="left">
           📁 {node.name}
         </Text>
       </HStack>

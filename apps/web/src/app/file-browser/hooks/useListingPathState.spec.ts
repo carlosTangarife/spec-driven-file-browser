@@ -47,7 +47,7 @@ describe('useListingPathState', () => {
     expect(result.current.listingPath).toBe('');
   });
 
-  it('applies parent listing wire path on Tab when input contains a slash', () => {
+  it('applies full nested wire path on Tab when input contains a slash without trailing slash', () => {
     const wrapper = createWrapper();
     const { result } = renderHook(() => useListingPathState(), { wrapper });
 
@@ -66,6 +66,6 @@ describe('useListingPathState', () => {
       } as unknown as KeyboardEvent<HTMLInputElement>);
     });
 
-    expect(result.current.listingPath).toBe('parent');
+    expect(result.current.listingPath).toBe('parent/child');
   });
 });

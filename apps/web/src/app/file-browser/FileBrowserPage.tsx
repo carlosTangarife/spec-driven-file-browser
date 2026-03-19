@@ -149,8 +149,10 @@ export const FileBrowserPage = () => {
             <Stack gap={4}>
               <Heading size="md">Tree</Heading>
               <Text fontSize="xs" color="fg.muted">
-                Click ▶ to expand. Double-click a folder name to set it as the
-                current path.
+                Click a folder row to expand or collapse. Double-click to set
+                that folder as the current path (adds a trailing slash in the
+                field). Type nested paths without a final slash—the tree uses the
+                full path.
               </Text>
               {treeErrorMessage && (
                 <Text colorPalette="red" fontSize="sm" role="alert">

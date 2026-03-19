@@ -12,7 +12,7 @@ export const PATH_INPUT_MAX_LENGTH = MAX_INPUT_LENGTH;
  *
  * - Trailing `/`: list that directory (`listingWirePath` = path without trailing slashes); no name filter.
  * - No `/`: root listing; `namePrefix` is the full string (filter when length ≥ 3).
- * - Contains `/` but no trailing `/`: parent path for listing; final segment is `namePrefix`.
+ * - Contains `/` but no trailing `/`: list that full path as the directory anchor (same as adding `/`); no name filter.
  */
 export const splitPathInput = (raw: string): {
   listingWirePath: string;
@@ -33,10 +33,7 @@ export const splitPathInput = (raw: string): {
     return { listingWirePath: '', namePrefix: trimmed };
   }
 
-  const dirPart = trimmed.slice(0, lastSlash);
-  const basePart = trimmed.slice(lastSlash + 1);
-
-  return { listingWirePath: dirPart, namePrefix: basePart };
+  return { listingWirePath: trimmed, namePrefix: '' };
 };
 
 /**
